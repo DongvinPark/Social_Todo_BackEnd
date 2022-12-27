@@ -11,7 +11,7 @@ spring:
     defer-datasource-initialization: true
     database-platform: H2
     hibernate:
-      ddl-auto: create-drop #?? ??? ? ?? ?? ???? ??.
+      ddl-auto: create-drop # Need special concern on this opion when deploying app on AWS, Heroku etc.
     open-in-view: false
     properties:
       hibernate:

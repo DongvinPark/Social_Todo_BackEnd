@@ -24,6 +24,8 @@ public class PrivateTodoDto {
 
     private String deadlineDate;
 
+    private boolean isFinished;
+
     private String createdAt;
 
     private String modifiedAt;
@@ -35,6 +37,7 @@ public class PrivateTodoDto {
             .authorUserId(entity.getAuthorUserId())
             .todoContent(entity.getTodoContent())
             .deadlineDate(CommonUtils.dateToString(entity.getDeadlineDate()))
+            .isFinished(entity.isFinished())
             .createdAt(CommonUtils.dateToString(entity.getCreatedAt()))
             .modifiedAt(CommonUtils.dateToString(entity.getModifiedAt()))
             .build();

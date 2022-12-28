@@ -13,7 +13,9 @@ public enum ErrorCode {
     ZERO_CONTENT_LENGTH("할 일의 내용은 빈칸일 수 없습니다."),
     CONTENT_LENGTH_TOO_LONG("할 일의 내용은 100자를 초과할 수 없습니다."),
     CANNOT_SET_PRIVATE_TODO_DEADLINE_ON_PAST("프라이빗 투두 아이템의 데드라인 날짜는 오늘 이전일 수 없습니다."),
-    CANNOT_SET_PRIVATE_TODO_DEADLINE_AFTER_365DAYS("프라이빗 투두 아이템의 데드라인 날짜는 오늘로부터 365일이 지난 날짜 이내여야 합니다.");
+    CANNOT_SET_PRIVATE_TODO_DEADLINE_AFTER_365DAYS("프라이빗 투두 아이템의 데드라인 날짜는 오늘로부터 365일이 지난 날짜 이내여야 합니다."),
+    USER_NOT_FOUND("사용자를 찾을 수 없습니다."),
+    CANNOT_FOLLOW_MORE_THEN_5000_USERS("팔로우한 사람의 숫자는 5,000명을 초과할 수 없습니다.");
 
     private final String description;
 }

@@ -1,6 +1,5 @@
 package com.example.socialtodobackend.entity;
 
-import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
@@ -10,8 +9,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
@@ -21,46 +18,13 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Builder
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class PrivateTodoEntity {
+public class SupportNagNumberEntity {
 
     @Id
     @GeneratedValue
-    private Long id;
+    private Long id_DependsOnPublicTodoPK;
 
-    private Long authorUserId;
-
-    private String todoContent;
-
-    private LocalDateTime deadlineDate;
-
-    private boolean isFinished;
-
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime modifiedAt;
+    private Long numberOfSupport;
+    private Long numberOfNag;
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

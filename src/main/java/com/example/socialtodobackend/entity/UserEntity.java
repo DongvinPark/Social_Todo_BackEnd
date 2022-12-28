@@ -34,6 +34,8 @@ public class UserEntity {
 
     private String statusMessage;
 
+    private Long numberOfFollowedUsers;
+
     @CreatedDate
     private LocalDateTime registeredAt;
 

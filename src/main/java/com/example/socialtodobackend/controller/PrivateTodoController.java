@@ -29,9 +29,9 @@ public class PrivateTodoController {
 
     @GetMapping("/private/todolist/{id}")
     public List<PrivateTodoDto> getPrivateTodoList(
-        @PathVariable String id
+        @PathVariable Long id
     ) {
-        return privateTodoService.getAllPrivateTodo(Long.parseLong(id));
+        return privateTodoService.getAllPrivateTodo(id);
     }
 
 
@@ -43,7 +43,7 @@ public class PrivateTodoController {
     }
 
 
-    @DeleteMapping(value = {"/delete/privatetodo", "/finish/privatetodo"})
+    @DeleteMapping("/delete/privatetodo")
     public List<PrivateTodoDto> removePrivateTodo(
         @RequestBody PrivateTodoDto privateTodoDto
     ) {

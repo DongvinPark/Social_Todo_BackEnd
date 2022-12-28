@@ -1,8 +1,11 @@
 package com.example.socialtodobackend.entity;
 
+import com.example.socialtodobackend.type.AlarmTypeCode;
 import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import lombok.AllArgsConstructor;
@@ -30,8 +33,14 @@ public class AlarmEntity {
     private Long alarmReceiverUserId;
     private Long alarmSenderUserId;
 
-
     private Long numberOfPeopleRelatedToAlarm;
+
+    private String alarmContent;
+
+    private Long relatedPublicTodoPKId;
+
+    @Enumerated(EnumType.STRING)
+    private AlarmTypeCode alarmType;
 
     @CreatedDate
     private LocalDateTime createdAt;

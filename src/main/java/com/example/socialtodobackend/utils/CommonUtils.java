@@ -3,8 +3,14 @@ package com.example.socialtodobackend.utils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-
 public class CommonUtils {
+
+    /**
+     * 한 명의 유저가 팔로우 할 수 있는 다른 유저의 수는 최대 5,000명 까지다.
+     * 그러나 한 명의 유저하 확보할 수 이는 팔로워의 숫자에는 제한이 없다.
+     * */
+    public static final int FOLLOW_LIMIT = 5_000;
+
 
     /**
      * 자바의 LocalDateTime의 기본 형태를

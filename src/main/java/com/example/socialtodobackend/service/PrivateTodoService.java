@@ -33,6 +33,7 @@ public class PrivateTodoService {
                 PrivateTodoEntity.builder()
                     .authorUserId(privateTodoDto.getAuthorUserId())
                     .todoContent(privateTodoDto.getTodoContent())
+                    .isFinished(false)
                     .deadlineDate(CommonUtils.stringToDate(privateTodoDto.getDeadlineDate()))
                     .build()
         );
@@ -45,8 +46,8 @@ public class PrivateTodoService {
      * 인증 기능을 도입할 때, 내가 쓴 것만 확인할 수 있도록 조치해야 한다.
      * */
     @Transactional
-    public List<PrivateTodoDto> getAllPrivateTodo(long authorUserId) {
-        List<PrivateTodoEntity> privateTodoEntityList = privateTodoRepository.findAllByAuthorUserId(authorUserId);
+    public List<PrivateTodoDto> getAllPrivateTodo(long authorUserPKId) {
+        List<PrivateTodoEntity> privateTodoEntityList = privateTodoRepository.findAllByAuthorUserId(authorUserPKId);
 
         List<PrivateTodoDto> privateTodoDtoList = new ArrayList<>();
         for(PrivateTodoEntity privateTodoEntity : privateTodoEntityList){
@@ -74,6 +75,7 @@ public class PrivateTodoService {
             ErrorCode.PRIVATE_TODO_NOT_FOUND) );
 
         privateTodoEntity.setTodoContent(privateTodoDto.getTodoContent());
+        privateTodoEntity.setFinished(privateTodoDto.isFinished());
         privateTodoEntity.setDeadlineDate(CommonUtils.stringToDate(privateTodoDto.getDeadlineDate()));
 
         return getAllPrivateTodo(privateTodoDto.getAuthorUserId());

@@ -1,6 +1,7 @@
 package com.example.socialtodobackend.controller;
 
 import com.example.socialtodobackend.dto.PrivateTodoDto;
+import com.example.socialtodobackend.entity.PrivateTodoEntity;
 import com.example.socialtodobackend.service.PrivateTodoService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -23,15 +24,22 @@ public class PrivateTodoController {
     public List<PrivateTodoDto> addPrivateTodo(
         @RequestBody PrivateTodoDto privateTodoDto
     ) {
-        return privateTodoService.createPrivateTodo(privateTodoDto);
+        PrivateTodoEntity createdPrivateTodoEntity = privateTodoService.createPrivateTodoEntity(
+            privateTodoDto.getAuthorUserId(),
+            privateTodoDto.getTodoContent(),
+            privateTodoDto.getDeadlineDate()
+            );
+        return privateTodoService.getAllPrivateTodo(
+            createdPrivateTodoEntity.getAuthorUserId()
+        );
     }
 
 
-    @GetMapping("/private/todolist/{id}")
+    @GetMapping("/private/todolist/{authorUserPKId}")
     public List<PrivateTodoDto> getPrivateTodoList(
-        @PathVariable Long id
+        @PathVariable Long authorUserPKId
     ) {
-        return privateTodoService.getAllPrivateTodo(id);
+        return privateTodoService.getAllPrivateTodo(authorUserPKId);
     }
 
 
@@ -39,7 +47,8 @@ public class PrivateTodoController {
     public List<PrivateTodoDto> updatePrivateTodo(
         @RequestBody PrivateTodoDto privateTodoDto
     ) {
-        return privateTodoService.updatePrivateTodo(privateTodoDto);
+        PrivateTodoEntity updatedPrivateTodoEntity = privateTodoService.updatePrivateTodoEntity(privateTodoDto);
+        return privateTodoService.getAllPrivateTodo(updatedPrivateTodoEntity.getAuthorUserId());
     }
 
 
@@ -47,7 +56,8 @@ public class PrivateTodoController {
     public List<PrivateTodoDto> removePrivateTodo(
         @RequestBody PrivateTodoDto privateTodoDto
     ) {
-        return privateTodoService.deletePrivateTodo(privateTodoDto);
+        privateTodoService.deletePrivateTodo(privateTodoDto);
+        return privateTodoService.getAllPrivateTodo(privateTodoDto.getAuthorUserId());
     }
 
 }

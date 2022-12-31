@@ -31,16 +31,17 @@ public class AlarmEntity {
     private Long id;
 
     private Long alarmReceiverUserId;
+
     private Long alarmSenderUserId;
 
     private Long numberOfPeopleRelatedToAlarm;
-
-    private String alarmContent;
 
     private Long relatedPublicTodoPKId;
 
     @Enumerated(EnumType.STRING)
     private AlarmTypeCode alarmType;
+
+    private String alarmContent;
 
     @CreatedDate
     private LocalDateTime createdAt;

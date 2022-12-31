@@ -23,11 +23,11 @@ public class AlarmDto {
 
     private Long numberOfUsersRelatedThisAlarm;
 
+    private Long relatedPublicTodoPKId;
+
+    private String alarmType;
+
     private String alarmContent;
-
-    private Long relatedPublicTodoPKId;//
-
-    private String alarmType;//
 
     private String createdAt;
 
@@ -40,9 +40,9 @@ public class AlarmDto {
             .alarmReceiveUserPKId(alarmEntity.getAlarmReceiverUserId())
             .alarmSenderUserPKId(alarmEntity.getAlarmSenderUserId())
             .numberOfUsersRelatedThisAlarm(alarmEntity.getNumberOfPeopleRelatedToAlarm())
-            .alarmContent(alarmEntity.getAlarmContent())
             .relatedPublicTodoPKId(alarmEntity.getRelatedPublicTodoPKId())
             .alarmType(alarmEntity.getAlarmType().toString())
+            .alarmContent(alarmEntity.getAlarmContent())
             .createdAt(CommonUtils.dateToString(alarmEntity.getCreatedAt()))
             .modifiedAt(CommonUtils.dateToString(alarmEntity.getModifiedAt()))
             .build();

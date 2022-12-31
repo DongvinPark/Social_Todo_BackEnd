@@ -3,7 +3,13 @@ package com.example.socialtodobackend.service;
 import com.example.socialtodobackend.dto.AlarmDto;
 import com.example.socialtodobackend.dto.FollowDto;
 import com.example.socialtodobackend.entity.AlarmEntity;
+import com.example.socialtodobackend.entity.UserEntity;
+import com.example.socialtodobackend.exception.SocialTodoException;
 import com.example.socialtodobackend.repository.AlarmRepository;
+import com.example.socialtodobackend.repository.UserRepository;
+import com.example.socialtodobackend.type.AlarmTypeCode;
+import com.example.socialtodobackend.type.ErrorCode;
+import com.example.socialtodobackend.utils.CommonUtils;
 import java.util.ArrayList;
 import java.util.List;
 import javax.transaction.Transactional;
@@ -15,6 +21,7 @@ import org.springframework.stereotype.Service;
 public class AlarmService {
 
     private final AlarmRepository alarmRepository;
+    private final UserRepository userRepository;
 
 
     /**
@@ -59,9 +66,29 @@ public class AlarmService {
      * */
     @Transactional
     public void sendFollowInfoAlarm(FollowDto followDto) {
-        //일단 나에게 ~~를 팔로우 했다는 내용을 구성하여 알림을 보낸다. 닉네임 쓰라.
+
+        UserEntity followSentUserEntity = userRepository.findById(followDto.getFollowSentUserPKId()).orElseThrow(()-> new SocialTodoException(
+            ErrorCode.USER_NOT_FOUND));
+        UserEntity followReceiverUserEntity = userRepository.findById(followDto.getFollowReceivedUserPKId()).orElseThrow(()-> new SocialTodoException(ErrorCode.USER_NOT_FOUND));
+
+        //일단 내가 팔로우를 보냈으므로, 나에게 ~~를 팔로우 했다는 내용을 구성하여 알림을 보낸다.
+        alarmRepository.save(
+            AlarmEntity.builder()
+                .alarmReceiverUserId(followDto.getFollowSentUserPKId())
+                .alarmType(AlarmTypeCode.FOLLOW)
+                .alarmContent(CommonUtils.makeAlarmMessageWhenFollowedOtherUser(followReceiverUserEntity.getNickname()))
+                .build()
+        );
 
         //그 다음 상대방에게 내가 팔로우 했다는 내용을 구성하여 알림을 보낸다. 닉네임 쓰라.
+        alarmRepository.save(
+            AlarmEntity.builder()
+                .alarmReceiverUserId(followDto.getFollowReceivedUserPKId())
+                .alarmSenderUserId(followDto.getFollowSentUserPKId())
+                .alarmType(AlarmTypeCode.FOLLOW)
+                .alarmContent(CommonUtils.makeAlarmMessageWhenGetNewFollower(followSentUserEntity.getNickname()))
+                .build()
+        );
     }
 
 

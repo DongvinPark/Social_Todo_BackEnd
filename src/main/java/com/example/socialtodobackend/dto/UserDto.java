@@ -23,7 +23,6 @@ public class UserDto {
 
     private String registeredAt;
 
-    private Long numberOfFollowedUsers;
 
 
     public static UserDto fromEntity(UserEntity userEntity){
@@ -32,7 +31,6 @@ public class UserDto {
             .nickname(userEntity.getNickname())
             .statusMessage(userEntity.getStatusMessage())
             .registeredAt(CommonUtils.dateToString(userEntity.getRegisteredAt()))
-            .numberOfFollowedUsers(userEntity.getNumberOfFollowedUsers())
             .build();
     }
 

@@ -5,8 +5,10 @@ import com.example.socialtodobackend.dto.UnfollowDto;
 import com.example.socialtodobackend.dto.UserDto;
 import com.example.socialtodobackend.entity.FollowEntity;
 import com.example.socialtodobackend.entity.UserEntity;
+import com.example.socialtodobackend.entity.UserFollowSendCountEntity;
 import com.example.socialtodobackend.exception.SocialTodoException;
 import com.example.socialtodobackend.repository.FollowRepository;
+import com.example.socialtodobackend.repository.FollowSendCountRepository;
 import com.example.socialtodobackend.repository.UserRepository;
 import com.example.socialtodobackend.type.ErrorCode;
 import com.example.socialtodobackend.utils.CommonUtils;
@@ -22,6 +24,7 @@ public class FollowService {
 
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
+    private final FollowSendCountRepository followSendCountRepository;
 
 
     /**
@@ -79,14 +82,24 @@ public class FollowService {
      * */
     @Transactional
     public void addFollowInfo(FollowDto followDto) {
-        UserEntity userEntity = userRepository.findById(followDto.getFollowSentUserPKId()).orElseThrow(()->new SocialTodoException(ErrorCode.USER_NOT_FOUND));
+        //팔로우 카운트 엔티티를 가져온다. 처음으로 누를 팔로우일 경우, 팔로우 카운트 엔티티 정보를 새로 저장하고 카운트를 0으로 설정한다.
+        UserFollowSendCountEntity userFollowSendCountEntity = followSendCountRepository.findById(followDto.getFollowSentUserPKId())
+            .orElse(
+                    followSendCountRepository.save(
+                    UserFollowSendCountEntity.builder()
+                        //주키를 팔로우 보낸 유저의 주키 아이디와 일치시켜서 셋팅해줘야 한다!!
+                        .id_dependsOnFollowSentUserPK(followDto.getFollowSentUserPKId())
+                        .userFollowSendCount(0L)
+                        .build()
+                    )
+            );
 
-        validateFollowLimit(followDto.getFollowSentUserPKId(), userEntity);
+        validateFollowLimit(userFollowSendCountEntity);
 
-        long numberOfFollowedUsers = userEntity.getNumberOfFollowedUsers();
+        long numberOfFollowedUsers = userFollowSendCountEntity.getUserFollowSendCount();
         numberOfFollowedUsers++;
-        userEntity.setNumberOfFollowedUsers(numberOfFollowedUsers);
-        userRepository.save(userEntity);
+        userFollowSendCountEntity.setUserFollowSendCount(numberOfFollowedUsers);
+        followSendCountRepository.save(userFollowSendCountEntity);
 
         followRepository.save(
             FollowEntity.builder()
@@ -110,15 +123,30 @@ public class FollowService {
      * */
     @Transactional
     public void deleteFollowInfo(UnfollowDto unfollowDto) {
+        //팔로우 정보 테이블에서 팔로우 정보를 삭제한다.
         followRepository.deleteById(unfollowDto.getId());
+
+        //팔로우 카운트를 감소시킨다.
+        UserFollowSendCountEntity userFollowSendCountEntity = followSendCountRepository.findById(
+            unfollowDto.getFollowCanceledUserPKId()).orElseThrow(() -> new SocialTodoException(ErrorCode.USER_NOT_FOUND));
+
+        validateFollowLimit(userFollowSendCountEntity);
+
+        long followCount = userFollowSendCountEntity.getUserFollowSendCount();
+        followCount--;
+        userFollowSendCountEntity.setUserFollowSendCount(followCount);
+        followSendCountRepository.save(userFollowSendCountEntity);
     }
 
 
     //------------- PRIVATE HELPER METHODS AREA ------------
-    private void validateFollowLimit(Long followSentUserPKId, UserEntity userEntity) {
+    private void validateFollowLimit(UserFollowSendCountEntity userFollowSendCountEntity) {
+        if(userFollowSendCountEntity.getUserFollowSendCount() == 0L){
+            throw new SocialTodoException(ErrorCode.HAS_NO_USER_TO_UNFOLLOW);
+        }
 
-        if(userEntity.getNumberOfFollowedUsers() == CommonUtils.FOLLOW_LIMIT){
-            throw new SocialTodoException(ErrorCode.CANNOT_FOLLOW_MORE_THEN_5000_USERS);
+        if(userFollowSendCountEntity.getUserFollowSendCount() == CommonUtils.FOLLOW_LIMIT){
+            throw new SocialTodoException(ErrorCode.CANNOT_FOLLOW_MORE_THAN_5000_USERS);
         }
     }
 

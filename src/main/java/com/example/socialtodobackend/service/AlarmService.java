@@ -29,9 +29,13 @@ public class AlarmService {
      * */
     @Transactional
     public List<AlarmDto> getAlarmList(Long userPKId) {
+        if(!userRepository.findById(userPKId).isPresent()){
+            throw new SocialTodoException(ErrorCode.USER_NOT_FOUND);
+        }
+
         List<AlarmDto> alarmDtoList = new ArrayList<>();
 
-        for(AlarmEntity alarmEntity : alarmRepository.findAllById(userPKId)){
+        for(AlarmEntity alarmEntity : alarmRepository.findAllByAlarmReceiverUserIdEquals(userPKId)){
             alarmDtoList.add(
                 AlarmDto.fromEntity(alarmEntity)
             );
@@ -44,9 +48,12 @@ public class AlarmService {
      * 알림을 1개 삭제하고 그 후 남은 알람 리스트를 반환한다.
      * */
     @Transactional
-    public List<AlarmDto> removeOneAlarm(AlarmDto alarmDto) {
-        alarmRepository.deleteById(alarmDto.getId());
-        return getAlarmList(alarmDto.getAlarmReceiveUserPKId());
+    public boolean removeOneAlarm(Long alarmEntityPKId) {
+        if(!alarmRepository.findById(alarmEntityPKId).isPresent()){
+            throw new SocialTodoException(ErrorCode.ALARM_INFO_NOT_FOUND);
+        }
+        alarmRepository.deleteById(alarmEntityPKId);
+        return true;
     }
 
 
@@ -56,8 +63,12 @@ public class AlarmService {
      * */
     @Transactional
     public List<AlarmDto> removeAllAlarm(Long userPKId) {
-        alarmRepository.deleteAllById(userPKId);
-        return getAlarmList(userPKId);
+        if(!userRepository.findById(userPKId).isPresent()){
+            throw new SocialTodoException(ErrorCode.USER_NOT_FOUND);
+        }
+
+        alarmRepository.deleteAllByAlarmReceiverUserIdEquals(userPKId);
+        return new ArrayList<>();
     }
 
 
@@ -69,6 +80,7 @@ public class AlarmService {
 
         UserEntity followSentUserEntity = userRepository.findById(followDto.getFollowSentUserPKId()).orElseThrow(()-> new SocialTodoException(
             ErrorCode.USER_NOT_FOUND));
+
         UserEntity followReceiverUserEntity = userRepository.findById(followDto.getFollowReceivedUserPKId()).orElseThrow(()-> new SocialTodoException(ErrorCode.USER_NOT_FOUND));
 
         //일단 내가 팔로우를 보냈으므로, 나에게 ~~를 팔로우 했다는 내용을 구성하여 알림을 보낸다.

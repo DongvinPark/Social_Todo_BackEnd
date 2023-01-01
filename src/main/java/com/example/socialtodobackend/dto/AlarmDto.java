@@ -15,7 +15,7 @@ import lombok.Setter;
 @Builder
 public class AlarmDto {
 
-    private Long id;
+    private Long alarmEntityPKId;
 
     private Long alarmReceiveUserPKId;
 
@@ -36,7 +36,7 @@ public class AlarmDto {
 
     public static AlarmDto fromEntity(AlarmEntity alarmEntity){
         return AlarmDto.builder()
-            .id(alarmEntity.getId())
+            .alarmEntityPKId(alarmEntity.getId())
             .alarmReceiveUserPKId(alarmEntity.getAlarmReceiverUserId())
             .alarmSenderUserPKId(alarmEntity.getAlarmSenderUserId())
             .numberOfUsersRelatedThisAlarm(alarmEntity.getNumberOfPeopleRelatedToAlarm())

@@ -1,8 +1,7 @@
 package com.example.socialtodobackend.controller;
 
 import com.example.socialtodobackend.dto.FollowDto;
-import com.example.socialtodobackend.dto.UnfollowDto;
-import com.example.socialtodobackend.dto.UserDto;
+import com.example.socialtodobackend.dto.UserFollowInfoDto;
 import com.example.socialtodobackend.service.AlarmService;
 import com.example.socialtodobackend.service.FollowService;
 import java.util.List;
@@ -23,7 +22,7 @@ public class FollowController {
 
 
     @GetMapping("/get/follower/{userPKId}")
-    public List<UserDto> getAllFollowersOfUser(
+    public List<UserFollowInfoDto> getAllFollowersOfUser(
         @PathVariable Long userPKId
     ){
         return followService.getFollowers(userPKId);
@@ -32,7 +31,7 @@ public class FollowController {
 
 
     @GetMapping("/get/followee/{userPKId}")
-    public List<UserDto> getAllFolloweeUsers(
+    public List<UserFollowInfoDto> getAllFolloweeUsers(
         @PathVariable Long userPKId
     ){
         return followService.getFollowees(userPKId);
@@ -54,11 +53,11 @@ public class FollowController {
 
 
 
-    @DeleteMapping("/unfollow")
+    @DeleteMapping("/unfollow/{followRepositoryPKId}")
     public void unfollow(
-        @RequestBody UnfollowDto unfollowDto
+        @PathVariable Long followRepositoryPKId
     ){
-        followService.deleteFollowInfo(unfollowDto);
+        followService.deleteFollowInfo(followRepositoryPKId);
     }
 
 

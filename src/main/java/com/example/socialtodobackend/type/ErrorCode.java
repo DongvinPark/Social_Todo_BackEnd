@@ -17,7 +17,9 @@ public enum ErrorCode {
     USER_NOT_FOUND("사용자를 찾을 수 없습니다."),
     CANNOT_FOLLOW_MORE_THAN_5000_USERS("팔로우한 사람의 숫자는 5,000명을 초과할 수 없습니다."),
     HAS_NO_USER_TO_UNFOLLOW("팔로우한 유저가 0명이어서 언팔로우를 할 수 없습니다."),
-    INVALID_DEADLINE_DATE_FORMAT("마감 기한 날짜의 포맷이 유효하지 않습니다. 마감 기힌 날짜 문자열은 yyyy-mm-dd 형태여야 합니다.");
+    INVALID_DEADLINE_DATE_FORMAT("마감 기한 날짜의 포맷이 유효하지 않습니다. 마감 기힌 날짜 문자열은 yyyy-mm-dd 형태여야 합니다."),
+    FOLLOW_INFO_NOT_FOUND("팔로우 정보를 찾을 수 없습니다."),
+    ALARM_INFO_NOT_FOUND("알림 정보를 찾을 수 없습니다.");
 
     private final String description;
 }

@@ -25,6 +25,7 @@ public class AlarmController {
     }
 
 
+
     /*
     알람을 보내는 기능은 유저가 소셜 투두 서비스 내에서 응원,잔소리,팔로우,할일완료 등의 행동을
     했을 때 백엔드에서 자동으로 수행되는 기능이며, 유저가 알림을 보내는 버튼을 프런트엔드에서
@@ -41,12 +42,13 @@ public class AlarmController {
     public List<AlarmDto> deleteOneAlarm(
         @RequestBody AlarmDto alarmDto
     ){
-        return alarmService.removeOneAlarm(alarmDto);
+        alarmService.removeOneAlarm(alarmDto.getAlarmEntityPKId());
+        return alarmService.getAlarmList(alarmDto.getAlarmReceiveUserPKId());
     }
 
 
 
-    @DeleteMapping("/delete/allalarms/{userPKId}")
+    @DeleteMapping("/delete/alarms/{userPKId}")
     public List<AlarmDto> deleteAllAlarms(
         @PathVariable Long userPKId
     ){

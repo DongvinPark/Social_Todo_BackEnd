@@ -1,0 +1,17 @@
+### user1,2,3 checks alarm
+GET http://localhost:8080/get/alarms/3
+
+
+### user1 deletes one alarm
+DELETE http://localhost:8080/delete/alarm
+Content-Type: application/json
+
+{
+  "alarmEntityPKId" : 6,
+  "alarmReceiveUserPKId" : 1
+}
+
+
+
+### user3 deletes all alarm
+DELETE http://localhost:8080/delete/alarms/3

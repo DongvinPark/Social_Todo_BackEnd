@@ -45,10 +45,12 @@ public class FollowController {
         @RequestBody FollowDto followDto
     ){
         //팔로우 정보를 저장한다.
-        followService.addFollowInfo(followDto);
+        boolean result = followService.addFollowInfo(followDto);
 
-        //팔로우 신청한 사람과 팔로우를 받아준 사람에게 알림을 전송한다.
-        alarmService.sendFollowInfoAlarm(followDto);
+        if(result){
+            alarmService.sendFollowInfoAlarm(followDto);
+        }
+        //팔로우 정보를 저장하는 것이 성공했을 때만, 팔로우 신청한 사람과 팔로우를 받아준 사람에게 알림을 전송한다.
     }
 
 

@@ -19,7 +19,10 @@ public enum ErrorCode {
     HAS_NO_USER_TO_UNFOLLOW("팔로우한 유저가 0명이어서 언팔로우를 할 수 없습니다."),
     INVALID_DEADLINE_DATE_FORMAT("마감 기한 날짜의 포맷이 유효하지 않습니다. 마감 기힌 날짜 문자열은 yyyy-mm-dd 형태여야 합니다."),
     FOLLOW_INFO_NOT_FOUND("팔로우 정보를 찾을 수 없습니다."),
-    ALARM_INFO_NOT_FOUND("알림 정보를 찾을 수 없습니다.");
+    ALARM_INFO_NOT_FOUND("알림 정보를 찾을 수 없습니다."),
+    PUBLIC_TODO_NOT_FOUND("공개 투두 아이템을 찾지 못했습니다."),
+    CANNOT_UPDATE_FINISHED_PUBLIC_TODO_ITEM("한 번 완료처리한 공개 투두 아이템은 수정할 수 없습니다."),
+    CANNOT_DELETE_TIMELINE_TARGET_TODO_ITEM("오늘 날짜에 타임라인에 포함되는 공개 투두 아이템은 삭제할 수 없습니다.");
 
     private final String description;
 }

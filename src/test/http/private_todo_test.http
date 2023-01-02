@@ -23,3 +23,8 @@ Accept: application/json
   "deadlineDate": "2023-01-23",
   "finished": true
 }
+
+
+
+### get All PrivateTodo items
+GET http://localhost:8080/private/todolist/1

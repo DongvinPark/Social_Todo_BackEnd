@@ -82,7 +82,7 @@ public class FollowService {
      * 팔로우 할 수 있는 최대 사용자 숫자는 5000명이다.
      * */
     @Transactional
-    public void addFollowInfo(FollowDto followDto) {
+    public boolean addFollowInfo(FollowDto followDto) {
         validateFollowRelatedUsers(followDto);
 
         //팔로우 카운트 엔티티를 가져온다. 회원가입이 완료되는 즉시 해당 유저에게 대응되는 UserFollowSendCountEntity 또한 followSendCountRepository에 저장되기 때문에 여기에서 탐색이 실패할 가능성은 거의 없다.
@@ -102,6 +102,7 @@ public class FollowService {
                 .followReceivedUserId(followDto.getFollowReceivedUserPKId())
                 .build()
         );
+        return true;
     }
 
 

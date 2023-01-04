@@ -1,17 +1,21 @@
 package com.example.socialtodobackend.service;
 
-import com.example.socialtodobackend.dto.AlarmDto;
-import com.example.socialtodobackend.dto.FollowDto;
+import com.example.socialtodobackend.dto.alarm.AlarmDto;
+import com.example.socialtodobackend.dto.follow.FollowDto;
+import com.example.socialtodobackend.dto.SupportNagDto;
 import com.example.socialtodobackend.entity.AlarmEntity;
+import com.example.socialtodobackend.entity.PublicTodoEntity;
 import com.example.socialtodobackend.entity.UserEntity;
 import com.example.socialtodobackend.exception.SocialTodoException;
 import com.example.socialtodobackend.repository.AlarmRepository;
+import com.example.socialtodobackend.repository.PublicTodoRepository;
 import com.example.socialtodobackend.repository.UserRepository;
 import com.example.socialtodobackend.type.AlarmTypeCode;
 import com.example.socialtodobackend.type.ErrorCode;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +26,8 @@ public class AlarmService {
 
     private final AlarmRepository alarmRepository;
     private final UserRepository userRepository;
+    private final PublicTodoRepository publicTodoRepository;
+
 
 
     /**
@@ -42,6 +48,7 @@ public class AlarmService {
         }
         return alarmDtoList;
     }
+
 
 
     /**
@@ -70,6 +77,7 @@ public class AlarmService {
         alarmRepository.deleteAllByAlarmReceiverUserIdEquals(userPKId);
         return new ArrayList<>();
     }
+
 
 
     /**
@@ -105,20 +113,97 @@ public class AlarmService {
 
 
 
-    //-------------- PRIVATE HELPER METHODS AREA ----------
+
 
     /**
-     * 하나의 공개 투두 아이템에 대하여 수 만 명 단위의 응원/잔소리가 있을 경우, 그 투두 아이템을 작성한 유저에게는
-     * 수 만 개의 알림을 제공하는 것이 아니라, 한 개의 알림만을 사용하여 "~외 ? 명이 응원/잔소리를 했습니다"라고
-     * 알려주는 로직을 사용하는 것이 사용성 측면에서 바람직하다.
+     * 특정 공개 투두 아이템에 대해서 응원을 눌렀을 때, 투두 아이템 작성자에게 알림을 보내는 기능.
+     * 해당 공개 투투 아이템에 대한 첫 응원일 경우 알림을 새로 보내줘야 하고,
+     * 이미 다른 사람이 응원을 누른적이 있다면, 해당알림을 찾아서 숫자를 +1 해준다.
      * */
-    private boolean doesAlarmExists(){
-        return false;
+    @Transactional
+    public void sendSupportInfoAlarm(SupportNagDto supportNagDto) {
+        //기존 알림이 있는지를 먼저 찾는다. 공개투두 아이템은 기존 알람이 없는 최초의 응원일 때만 찾아내면 된다.
+        //기존 알림이 있는지 찾아낼 때는 알림 엔티티의 relatedPublicTodoPKId와 alarmType이 있으면 된다.
+        //각각의 모든 공개 투두 아이템에 대하여 발생 가능한 응원 알림은 0개 또는 단 1 개만 가능하기 때문이다.
+        Optional<AlarmEntity> optionalAlarmEntity = alarmRepository.findAlarmEntityByRelatedPublicTodoPKIdEqualsAndAlarmTypeEquals(
+            supportNagDto.getPublicTodoPKId(), AlarmTypeCode.SUPPORT
+        );
+        if(optionalAlarmEntity.isPresent()){
+            //기존 알림이 존재한다. 응원 해준 사람 숫자만 += 1 해주면 된다.
+            AlarmEntity alarmEntity = optionalAlarmEntity.get();
+            long supportSentUserNumber = alarmEntity.getNumberOfPeopleRelatedToAlarm();
+            supportSentUserNumber++;
+            alarmEntity.setNumberOfPeopleRelatedToAlarm(supportSentUserNumber);
+            alarmRepository.save(alarmEntity);
+        } else {
+            //기존 알림이 존재하지 않으므로 새로 만들어야 한다.
+            //이때는 알림을 받는 유저의 주키 아이디를 특정하기 위해서 publicTodoRepository를 검색해야 한다.
+            PublicTodoEntity publicTodoEntity = publicTodoRepository.findById(supportNagDto.getPublicTodoPKId()).orElseThrow(
+                () -> new SocialTodoException(ErrorCode.PUBLIC_TODO_NOT_FOUND)
+            );
+
+            alarmRepository.save(
+                AlarmEntity.builder()
+                    .alarmReceiverUserId(publicTodoEntity.getAuthorUserId())
+                    .alarmSenderUserId(supportNagDto.getSupportNagSentUserPKId())
+                    .numberOfPeopleRelatedToAlarm(1L)
+                    .relatedPublicTodoPKId(supportNagDto.getPublicTodoPKId())
+                    .alarmType(AlarmTypeCode.SUPPORT)
+                    .alarmContent(CommonUtils.makeSupportAlarmMessage())
+                    .build()
+            );
+
+        }
     }
 
 
 
+
+
+    /**
+     *
+     * */
+    @Transactional
+    public void sendNagInfoAlarm(SupportNagDto supportNagDto) {
+        //기존 알림이 있는지를 먼저 찾는다. 공개투두 아이템은 기존 알람이 없는 최초의 응원일 때만 찾아내면 된다.
+        //기존 알림이 있는지 찾아낼 때는 알림 엔티티의 relatedPublicTodoPKId와 alarmType이 있으면 된다.
+        //각각의 모든 공개 투두 아이템에 대하여 발생 가능한 잔소리 알림은 0개 또는 단 1 개만 가능하기 때문이다.
+        Optional<AlarmEntity> optionalAlarmEntity = alarmRepository.findAlarmEntityByRelatedPublicTodoPKIdEqualsAndAlarmTypeEquals(
+            supportNagDto.getPublicTodoPKId(), AlarmTypeCode.NAG
+        );
+        if(optionalAlarmEntity.isPresent()){
+            //기존 알림이 존재한다. 잔소리 해준 사람 숫자만 += 1 해주면 된다.
+            AlarmEntity alarmEntity = optionalAlarmEntity.get();
+            long nagSentUserNumber = alarmEntity.getNumberOfPeopleRelatedToAlarm();
+            nagSentUserNumber++;
+            alarmEntity.setNumberOfPeopleRelatedToAlarm(nagSentUserNumber);
+            alarmRepository.save(alarmEntity);
+        } else {
+            //기존 알림이 존재하지 않으므로 새로 만들어야 한다.
+            //이때는 알림을 받는 유저의 주키 아이디를 특정하기 위해서 publicTodoRepository를 검색해야 한다.
+            PublicTodoEntity publicTodoEntity = publicTodoRepository.findById(supportNagDto.getPublicTodoPKId()).orElseThrow(
+                () -> new SocialTodoException(ErrorCode.PUBLIC_TODO_NOT_FOUND)
+            );
+
+            alarmRepository.save(
+                AlarmEntity.builder()
+                    .alarmReceiverUserId(publicTodoEntity.getAuthorUserId())
+                    .alarmSenderUserId(supportNagDto.getSupportNagSentUserPKId())
+                    .numberOfPeopleRelatedToAlarm(1L)
+                    .relatedPublicTodoPKId(supportNagDto.getPublicTodoPKId())
+                    .alarmType(AlarmTypeCode.NAG)
+                    .alarmContent(CommonUtils.makeNagAlarmMessage())
+                    .build()
+            );
+        }
+    }
+
+    //-------------- PRIVATE HELPER METHODS AREA ----------
+
+
 }
+
+
 
 
 

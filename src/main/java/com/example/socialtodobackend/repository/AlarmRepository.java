@@ -1,7 +1,9 @@
 package com.example.socialtodobackend.repository;
 
 import com.example.socialtodobackend.entity.AlarmEntity;
+import com.example.socialtodobackend.type.AlarmTypeCode;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AlarmRepository extends JpaRepository<AlarmEntity, Long> {
@@ -13,5 +15,7 @@ public interface AlarmRepository extends JpaRepository<AlarmEntity, Long> {
      * 알림들만을 제거하는 메서드이므로 혼동하면 안 됨.
      * */
     void deleteAllByAlarmReceiverUserIdEquals(Long id);
+
+    Optional<AlarmEntity> findAlarmEntityByRelatedPublicTodoPKIdEqualsAndAlarmTypeEquals(Long relatedPublicTodoPKId, AlarmTypeCode alarmTypeCode);
 
 }

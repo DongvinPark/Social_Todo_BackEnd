@@ -1,18 +1,18 @@
 ### create private todo
-POST http://localhost:8080/create/privatetodo
+POST http://localhost:8080/create/private/todo
 Content-Type: application/json
 Accept: application/json
 
 {
     "authorUserId": 1,
-    "todoContent": "블루아카 플레이하고 자기",
+    "todoContent": "블루아카 하기",
     "deadlineDate": "2023-01-21"
 }
 
 
 
 ### update private todo
-PUT http://localhost:8080/update/privatetodo
+PUT http://localhost:8080/update/private/todo
 Content-Type: application/json
 Accept: application/json
 
@@ -26,5 +26,17 @@ Accept: application/json
 
 
 
+### delete private todo
+DELETE http://localhost:8080/delete/private/todo
+Content-Type: application/json
+Accept: application/json
+
+{
+  "id": 1,
+  "authorUserPKId": 1
+}
+
+
+
 ### get All PrivateTodo items
-GET http://localhost:8080/private/todolist/1
+GET http://localhost:8080/get/private/todos/1

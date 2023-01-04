@@ -1,8 +1,7 @@
-package com.example.socialtodobackend.dto;
+package com.example.socialtodobackend.dto.alarm;
 
 import com.example.socialtodobackend.entity.AlarmEntity;
 import com.example.socialtodobackend.utils.CommonUtils;
-import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,10 +14,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 public class AlarmDto {
-    @NotNull
+
     private Long alarmEntityPKId;
 
-    @NotNull
     private Long alarmReceiveUserPKId;
 
     private Long alarmSenderUserPKId;

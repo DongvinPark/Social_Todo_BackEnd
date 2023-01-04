@@ -11,7 +11,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.example.socialtodobackend.dto.PrivateTodoDto;
+import com.example.socialtodobackend.dto.privatetodo.PrivateTodoDto;
 import com.example.socialtodobackend.entity.PrivateTodoEntity;
 import com.example.socialtodobackend.exception.SocialTodoException;
 import com.example.socialtodobackend.repository.PrivateTodoRepository;

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,7 +25,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class PublicTodoEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private Long authorUserId;
@@ -33,15 +34,15 @@ public class PublicTodoEntity {
 
     private String todoContent;
 
+    private LocalDateTime deadlineDate;
+
+    private boolean isFinished;
+
     @CreatedDate
     private LocalDateTime createdAt;
 
     @LastModifiedDate
     private LocalDateTime modifiedAt;
-
-    private LocalDateTime deadlineDate;
-
-    private boolean isFinished;
 
 }
 

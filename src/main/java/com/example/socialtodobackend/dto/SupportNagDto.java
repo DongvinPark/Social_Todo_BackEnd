@@ -1,4 +1,4 @@
-package com.example.socialtodobackend.dto.follow;
+package com.example.socialtodobackend.dto;
 
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -12,11 +12,10 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class FollowDto {
+public class SupportNagDto {
     @NotNull
-    private Long followSentUserPKId;
+    private Long publicTodoPKId;
 
     @NotNull
-    private Long followReceivedUserPKId;
-
+    private Long supportNagSentUserPKId;
 }

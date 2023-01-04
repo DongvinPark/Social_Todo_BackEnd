@@ -1,8 +1,10 @@
 package com.example.socialtodobackend.controller;
 
-import com.example.socialtodobackend.dto.AlarmDto;
+import com.example.socialtodobackend.dto.alarm.AlarmDeleteRequest;
+import com.example.socialtodobackend.dto.alarm.AlarmDto;
 import com.example.socialtodobackend.service.AlarmService;
 import java.util.List;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,7 +38,7 @@ public class AlarmController {
 
     @DeleteMapping("/delete/alarm")
     public List<AlarmDto> deleteOneAlarm(
-        @RequestBody AlarmDto alarmDto
+        @RequestBody @Valid AlarmDeleteRequest alarmDto
     ){
         alarmService.removeOneAlarm(alarmDto.getAlarmEntityPKId());
         return alarmService.getAlarmList(alarmDto.getAlarmReceiveUserPKId());

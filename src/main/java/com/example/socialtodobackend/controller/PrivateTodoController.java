@@ -1,9 +1,12 @@
 package com.example.socialtodobackend.controller;
 
-import com.example.socialtodobackend.dto.PrivateTodoDto;
-import com.example.socialtodobackend.entity.PrivateTodoEntity;
+import com.example.socialtodobackend.dto.privatetodo.PrivateTodoCreateRequest;
+import com.example.socialtodobackend.dto.privatetodo.PrivateTodoDeleteRequest;
+import com.example.socialtodobackend.dto.privatetodo.PrivateTodoDto;
+import com.example.socialtodobackend.dto.privatetodo.PrivateTodoUpdateRequest;
 import com.example.socialtodobackend.service.PrivateTodoService;
 import java.util.List;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,22 +23,16 @@ public class PrivateTodoController {
     private final PrivateTodoService privateTodoService;
 
 
-    @PostMapping("/create/privatetodo")
+    @PostMapping("/create/private/todo")
     public List<PrivateTodoDto> addPrivateTodo(
-        @RequestBody PrivateTodoDto privateTodoDto
+        @RequestBody @Valid PrivateTodoCreateRequest privateTodoCreateRequest
     ) {
-        PrivateTodoEntity createdPrivateTodoEntity = privateTodoService.createPrivateTodoEntity(
-            privateTodoDto.getAuthorUserId(),
-            privateTodoDto.getTodoContent(),
-            privateTodoDto.getDeadlineDate()
-            );
-        return privateTodoService.getAllPrivateTodo(
-            createdPrivateTodoEntity.getAuthorUserId()
-        );
+        privateTodoService.createPrivateTodoEntity(privateTodoCreateRequest);
+        return privateTodoService.getAllPrivateTodo(privateTodoCreateRequest.getAuthorUserId());
     }
 
 
-    @GetMapping("/private/todolist/{authorUserPKId}")
+    @GetMapping("/get/private/todos/{authorUserPKId}")
     public List<PrivateTodoDto> getPrivateTodoList(
         @PathVariable Long authorUserPKId
     ) {
@@ -43,21 +40,21 @@ public class PrivateTodoController {
     }
 
 
-    @PutMapping("/update/privatetodo")
+    @PutMapping("/update/private/todo")
     public List<PrivateTodoDto> updatePrivateTodo(
-        @RequestBody PrivateTodoDto privateTodoDto
+        @RequestBody @Valid PrivateTodoUpdateRequest privateTodoUpdateRequest
     ) {
-        PrivateTodoEntity updatedPrivateTodoEntity = privateTodoService.updatePrivateTodoEntity(privateTodoDto);
-        return privateTodoService.getAllPrivateTodo(updatedPrivateTodoEntity.getAuthorUserId());
+        privateTodoService.updatePrivateTodoEntity(privateTodoUpdateRequest);
+        return privateTodoService.getAllPrivateTodo(privateTodoUpdateRequest.getAuthorUserId());
     }
 
 
-    @DeleteMapping("/delete/privatetodo")
+    @DeleteMapping("/delete/private/todo")
     public List<PrivateTodoDto> removePrivateTodo(
-        @RequestBody PrivateTodoDto privateTodoDto
+        @RequestBody @Valid PrivateTodoDeleteRequest privateTodoDeleteRequest
     ) {
-        privateTodoService.deletePrivateTodo(privateTodoDto);
-        return privateTodoService.getAllPrivateTodo(privateTodoDto.getAuthorUserId());
+        privateTodoService.deletePrivateTodo(privateTodoDeleteRequest);
+        return privateTodoService.getAllPrivateTodo(privateTodoDeleteRequest.getAuthorUserPKId());
     }
 
 }

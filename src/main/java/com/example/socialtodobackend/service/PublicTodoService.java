@@ -1,6 +1,8 @@
 package com.example.socialtodobackend.service;
 
-import com.example.socialtodobackend.dto.PublicTodoDto;
+import com.example.socialtodobackend.dto.publictodo.PublicTodoCreateRequest;
+import com.example.socialtodobackend.dto.publictodo.PublicTodoDto;
+import com.example.socialtodobackend.dto.publictodo.PublicTodoUpdateRequest;
 import com.example.socialtodobackend.entity.PublicTodoEntity;
 import com.example.socialtodobackend.entity.SupportNagNumberEntity;
 import com.example.socialtodobackend.exception.SocialTodoException;
@@ -15,10 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PublicTodoService {
 
     private final PublicTodoRepository publicTodoRepository;
@@ -55,21 +59,21 @@ public class PublicTodoService {
      * 주키와 동일한 주키를 가지는 엔티티를 저장해야 한다.
      * */
     @Transactional
-    public boolean addPublicTodo(PublicTodoDto publicTodoDto) {
-        if(!userRepository.findById(publicTodoDto.getAuthorUserPKId()).isPresent()){
+    public boolean addPublicTodo(PublicTodoCreateRequest publicTodoCreateRequest) {
+        if(!userRepository.findById(publicTodoCreateRequest.getAuthorUserPKId()).isPresent()){
             throw new SocialTodoException(ErrorCode.USER_NOT_FOUND);
         }
 
-        validateContentLength(publicTodoDto.getPublicTodoContent());
-        validateDateFormat(publicTodoDto.getDeadlineDate());
-        validateDeadlineDate(publicTodoDto.getDeadlineDate());
+        validateContentLength(publicTodoCreateRequest.getPublicTodoContent());
+        validateDateFormat(publicTodoCreateRequest.getDeadlineDate());
+        validateDeadlineDate(publicTodoCreateRequest.getDeadlineDate());
 
         PublicTodoEntity savedEntity = publicTodoRepository.save(
             PublicTodoEntity.builder()
-                .authorUserId(publicTodoDto.getAuthorUserPKId())
-                .authorNickname(publicTodoDto.getAuthorUserNickname())
-                .todoContent(publicTodoDto.getPublicTodoContent())
-                .deadlineDate(CommonUtils.stringToDate(publicTodoDto.getDeadlineDate()))
+                .authorUserId(publicTodoCreateRequest.getAuthorUserPKId())
+                .authorNickname(publicTodoCreateRequest.getAuthorUserNickname())
+                .todoContent(publicTodoCreateRequest.getPublicTodoContent())
+                .deadlineDate(CommonUtils.stringToDate(publicTodoCreateRequest.getDeadlineDate()))
                 .isFinished(false)
                 .build()
         );
@@ -93,7 +97,8 @@ public class PublicTodoService {
 
     /**
      * 공개 투두 아이템을 수정한다.
-     * 한 번 완료 처리한 공개 투두 아이템은 어떤 수정도 불가능하다.
+     * 한 번 공개한 공개 투투 아이템의 content는 수정이 불가능하다. 상황에 따라서 디데이 기한 또는 완료 여부를 수정할 수 있을 뿐이다.
+     * 한 번 완료 처리한 공개 투두 아이템은 어떤 수정도 불가능하며 삭제만이 가능하다.
      * <br><br/>
      * 아직 완료 처리가 되지 않은 것을 전제했을 때, 수정이 가능한 경우는 오직 세 가지 뿐이고 각각의 경우에 대해서도 수정할 수 있는 범위가 정해져 있다.
      * <br><br/>
@@ -102,8 +107,8 @@ public class PublicTodoService {
      * 마감 기한이 도달하지 않았거나 이미 지나버렸다면, 마감기한과 완료 여부를 변경시킬 수 있다.
      * */
     @Transactional
-    public boolean updatePublicTodo(PublicTodoDto publicTodoDto) {
-        PublicTodoEntity publicTodoEntity = publicTodoRepository.findById(publicTodoDto.getPublicTodoPKId()).orElseThrow(
+    public boolean updatePublicTodo(PublicTodoUpdateRequest publicTodoUpdateRequest) {
+        PublicTodoEntity publicTodoEntity = publicTodoRepository.findById(publicTodoUpdateRequest.getPublicTodoPKId()).orElseThrow(
             () -> new SocialTodoException(ErrorCode.PUBLIC_TODO_NOT_FOUND)
         );
 
@@ -116,16 +121,16 @@ public class PublicTodoService {
             CommonUtils.dateToString(LocalDateTime.now())
                 .equals(CommonUtils.dateToString(publicTodoEntity.getDeadlineDate()))
         ){
-            publicTodoEntity.setFinished(publicTodoDto.isFinished());
+            publicTodoEntity.setFinished(publicTodoUpdateRequest.isFinished());
             publicTodoRepository.save(publicTodoEntity);
+            log.info("마감기한 도달한 날에 할일 완료처리");
         } else {
             //오늘이 아닌 경우를 처리한다. 즉, 마감기한이 아직 아니거나 이미 지나버린 경우다.
-            validateContentLength(publicTodoDto.getPublicTodoContent());
-            validateDateFormat(publicTodoDto.getDeadlineDate());
-            validateDeadlineDate(publicTodoDto.getDeadlineDate());
+            validateDateFormat(publicTodoUpdateRequest.getDeadlineDate());
+            validateDeadlineDate(publicTodoUpdateRequest.getDeadlineDate());
 
-            publicTodoEntity.setDeadlineDate(CommonUtils.stringToDate(publicTodoDto.getDeadlineDate()));
-            publicTodoEntity.setFinished(publicTodoDto.isFinished());
+            publicTodoEntity.setDeadlineDate(CommonUtils.stringToDate(publicTodoUpdateRequest.getDeadlineDate()));
+            publicTodoEntity.setFinished(publicTodoUpdateRequest.isFinished());
             publicTodoRepository.save(publicTodoEntity);
         }
         return true;
@@ -158,11 +163,11 @@ public class PublicTodoService {
         }
 
         publicTodoRepository.deleteById(publicTodoPKId);
+        //publicTodoEntity에 대응되는 SupportNagNumberEntity도 항상 같이 삭제해 줘야 한다.
+        publicTodoSupportNagNumberRepository.deleteById(publicTodoPKId);
 
         return true;
     }
-
-
 
 
 

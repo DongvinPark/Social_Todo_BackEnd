@@ -1,4 +1,4 @@
-package com.example.socialtodobackend.dto;
+package com.example.socialtodobackend.dto.publictodo;
 
 import com.example.socialtodobackend.entity.PublicTodoEntity;
 import com.example.socialtodobackend.utils.CommonUtils;

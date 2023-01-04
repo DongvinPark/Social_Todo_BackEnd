@@ -28,19 +28,31 @@ Accept: application/json
 }
 
 
+
+### user4 sign up
+POST http://localhost:8080/temp/signup
+Content-Type: application/json
+Accept: application/json
+
+{
+  "nickname": "four"
+}
+
+
+
 ### user3 follows user1,2 / user1 follows user2
 POST http://localhost:8080/follow
 Content-Type: application/json
 
 {
-    "followSentUserPKId": 3,
-    "followReceivedUserPKId": 2
+    "followSentUserPKId": 2,
+    "followReceivedUserPKId": 1
 }
 
 
 
 ### check followees of user3
-GET http://localhost:8080/get/followee/3
+GET http://localhost:8080/get/followee/1
 
 
 
@@ -50,4 +62,4 @@ GET http://localhost:8080/get/follower/2
 
 
 ### user3 ufollows user1,2
-DELETE http://localhost:8080/unfollow/7
+DELETE http://localhost:8080/unfollow/4

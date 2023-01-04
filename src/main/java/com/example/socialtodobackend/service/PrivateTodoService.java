@@ -1,6 +1,9 @@
 package com.example.socialtodobackend.service;
 
-import com.example.socialtodobackend.dto.PrivateTodoDto;
+import com.example.socialtodobackend.dto.privatetodo.PrivateTodoCreateRequest;
+import com.example.socialtodobackend.dto.privatetodo.PrivateTodoDeleteRequest;
+import com.example.socialtodobackend.dto.privatetodo.PrivateTodoDto;
+import com.example.socialtodobackend.dto.privatetodo.PrivateTodoUpdateRequest;
 import com.example.socialtodobackend.entity.PrivateTodoEntity;
 import com.example.socialtodobackend.exception.SocialTodoException;
 import com.example.socialtodobackend.repository.PrivateTodoRepository;
@@ -8,8 +11,8 @@ import com.example.socialtodobackend.type.ErrorCode;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,23 +28,23 @@ public class PrivateTodoService {
      * 프라이빗 투두 아이템 한 개를 추가하고, 그 후의 프라이빗 투두 리스트를 반환한다.
      * */
     @Transactional
-    public PrivateTodoEntity createPrivateTodoEntity(
-        Long authorUserPKId,
-        String todoContent,
-        String deadLineDateString
+    public boolean createPrivateTodoEntity(
+        PrivateTodoCreateRequest privateTodoCreateRequest
     ) {
-        validateContentLength(todoContent);
-        validateDateFormat(deadLineDateString);
-        validateDeadlineDate(deadLineDateString);
+        validateContentLength(privateTodoCreateRequest.getTodoContent());
+        validateDateFormat(privateTodoCreateRequest.getDeadlineDate());
+        validateDeadlineDate(privateTodoCreateRequest.getDeadlineDate());
 
-        return privateTodoRepository.save(
-                PrivateTodoEntity.builder()
-                    .authorUserId(authorUserPKId)
-                    .todoContent(todoContent)
-                    .isFinished(false)
-                    .deadlineDate(CommonUtils.stringToDate(deadLineDateString))
-                    .build()
+        privateTodoRepository.save(
+            PrivateTodoEntity.builder()
+                .authorUserId(privateTodoCreateRequest.getAuthorUserId())
+                .todoContent(privateTodoCreateRequest.getTodoContent())
+                .isFinished(false)
+                .deadlineDate(CommonUtils.stringToDate(privateTodoCreateRequest.getDeadlineDate()))
+                .build()
         );
+
+        return true;
     }
 
 
@@ -52,16 +55,7 @@ public class PrivateTodoService {
      * */
     @Transactional
     public List<PrivateTodoDto> getAllPrivateTodo(long authorUserPKId) {
-        List<PrivateTodoEntity> privateTodoEntityList = privateTodoRepository.findAllByAuthorUserId(authorUserPKId);
-
-        List<PrivateTodoDto> privateTodoDtoList = new ArrayList<>();
-        for(PrivateTodoEntity privateTodoEntity : privateTodoEntityList){
-            privateTodoDtoList.add(
-                PrivateTodoDto.fromEntity(privateTodoEntity)
-            );
-        }
-
-        return privateTodoDtoList;
+        return privateTodoRepository.findAllByAuthorUserId(authorUserPKId).stream().map(PrivateTodoDto::fromEntity).collect(Collectors.toList());
     }
 
 
@@ -72,22 +66,22 @@ public class PrivateTodoService {
      * 또한 자기 자신의 프라이빗 투두만을 수정할 수 있다.
      * */
     @Transactional
-    public PrivateTodoEntity updatePrivateTodoEntity(PrivateTodoDto privateTodoDto) {
+    public boolean updatePrivateTodoEntity(PrivateTodoUpdateRequest privateTodoUpdateRequest) {
 
-        validateContentLength(privateTodoDto.getTodoContent());
-        validateDateFormat(privateTodoDto.getDeadlineDate());
-        validateDeadlineDate(privateTodoDto.getDeadlineDate());
+        validateContentLength(privateTodoUpdateRequest.getTodoContent());
+        validateDateFormat(privateTodoUpdateRequest.getDeadlineDate());
+        validateDeadlineDate(privateTodoUpdateRequest.getDeadlineDate());
 
-        PrivateTodoEntity privateTodoEntity = privateTodoRepository.findById(privateTodoDto.getId()).orElseThrow( () -> new SocialTodoException(
+        PrivateTodoEntity privateTodoEntity = privateTodoRepository.findById(privateTodoUpdateRequest.getId()).orElseThrow( () -> new SocialTodoException(
             ErrorCode.PRIVATE_TODO_NOT_FOUND) );
 
-        privateTodoEntity.setTodoContent(privateTodoDto.getTodoContent());
-        privateTodoEntity.setFinished(privateTodoDto.isFinished());
-        privateTodoEntity.setDeadlineDate(CommonUtils.stringToDate(privateTodoDto.getDeadlineDate()));
+        privateTodoEntity.setTodoContent(privateTodoUpdateRequest.getTodoContent());
+        privateTodoEntity.setFinished(privateTodoUpdateRequest.isFinished());
+        privateTodoEntity.setDeadlineDate(CommonUtils.stringToDate(privateTodoUpdateRequest.getDeadlineDate()));
 
         privateTodoRepository.save(privateTodoEntity);
 
-        return privateTodoEntity;
+        return true;
     }
 
 
@@ -98,8 +92,8 @@ public class PrivateTodoService {
      * 추후에 JPA의 delete메서드를 거치지 않고 DB에 쿼리를 직접 날리는 방식으로 수정하는 것이 필요하다.
      * */
     @Transactional
-    public boolean deletePrivateTodo(PrivateTodoDto privateTodoDto) {
-        PrivateTodoEntity privateTodoEntity = privateTodoRepository.findById(privateTodoDto.getId()).orElseThrow(
+    public boolean deletePrivateTodo(PrivateTodoDeleteRequest privateTodoDeleteRequest) {
+        PrivateTodoEntity privateTodoEntity = privateTodoRepository.findById(privateTodoDeleteRequest.getId()).orElseThrow(
             () -> new SocialTodoException(ErrorCode.PRIVATE_TODO_NOT_FOUND)
         );
         privateTodoRepository.deleteById(privateTodoEntity.getId());

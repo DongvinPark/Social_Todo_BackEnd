@@ -1,0 +1,83 @@
+### user1 post publicTodo 1
+POST http://localhost:8080/create/public/todo
+Content-Type: application/json
+Accept: application/json
+
+{
+  "authorUserPKId" : 1,
+  "authorUserNickname" : "one",
+  "publicTodoContent" : "develop Social Todo App BackEnd",
+  "deadlineDate" : "2023-01-31"
+}
+
+
+
+### user1 post publicTodo 2
+POST http://localhost:8080/create/public/todo
+Content-Type: application/json
+Accept: application/json
+
+{
+  "authorUserPKId" : 1,
+  "authorUserNickname" : "one",
+  "publicTodoContent" : "work2",
+  "deadlineDate" : "2023-01-31"
+}
+
+
+
+
+### user2,3,4 press support/nag on publicTodo 1
+PUT http://localhost:8080/create/nag
+Content-Type: application/json
+
+{
+  "publicTodoPKId" : 1,
+  "supportNagSentUserPKId" : 4
+}
+
+
+
+### user1 checks the support/nag pressed users
+GET http://localhost:8080/get/nag/users/1
+
+
+
+
+### user2,3,4 canceled support/nag
+PUT http://localhost:8080/cancel/nag
+Content-Type: application/json
+
+{
+  "publicTodoPKId" : 1,
+  "supportNagSentUserPKId" : 4
+}
+
+
+
+
+
+### user1 updates deadlineDate or finishes publicTodo 1 before deadlineDate
+PUT localhost:8080/update/public/todo
+Content-Type: application/json
+Accept: application/json
+
+{
+  "publicTodoPKId": 2,
+  "authorUserPKId": 1,
+  "deadlineDate": "2023-01-04",
+  "finished": false
+}
+
+
+
+
+### user1 deletes publicTodo 1 and 2
+DELETE localhost:8080/delete/public/todo
+Content-Type: application/json
+
+{
+  "publicTodoPKId": 1,
+  "authorUserPKId": 1
+ }
+

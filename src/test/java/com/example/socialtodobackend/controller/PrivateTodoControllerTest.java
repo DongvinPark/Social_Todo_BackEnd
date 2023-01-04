@@ -8,7 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.example.socialtodobackend.dto.PrivateTodoDto;
+import com.example.socialtodobackend.dto.privatetodo.PrivateTodoDto;
 import com.example.socialtodobackend.entity.PrivateTodoEntity;
 import com.example.socialtodobackend.service.PrivateTodoService;
 import com.example.socialtodobackend.utils.CommonUtils;

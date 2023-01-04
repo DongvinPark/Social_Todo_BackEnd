@@ -1,7 +1,7 @@
 package com.example.socialtodobackend.service;
 
-import com.example.socialtodobackend.dto.FollowDto;
-import com.example.socialtodobackend.dto.UserFollowInfoDto;
+import com.example.socialtodobackend.dto.follow.FollowDto;
+import com.example.socialtodobackend.dto.follow.UserFollowInfoDto;
 import com.example.socialtodobackend.entity.FollowEntity;
 import com.example.socialtodobackend.entity.UserEntity;
 import com.example.socialtodobackend.entity.UserFollowSendCountEntity;
@@ -38,13 +38,7 @@ public class FollowService {
             UserEntity userEntity = userRepository.findById(followEntity.getFollowSentUserId()).orElseThrow(()->new SocialTodoException(ErrorCode.USER_NOT_FOUND));
 
             userDtoList.add(
-                UserFollowInfoDto.builder()
-                    .id(userEntity.getId())
-                    .pkIdInFollowEntity(followEntity.getId())
-                    .nickname(userEntity.getNickname())
-                    .statusMessage(userEntity.getStatusMessage())
-                    .registeredAt(CommonUtils.dateToString(userEntity.getRegisteredAt()))
-                    .build()
+                UserFollowInfoDto.fromEntity(userEntity, followEntity)
             );
         }
         return userDtoList;
@@ -63,13 +57,7 @@ public class FollowService {
             UserEntity userEntity = userRepository.findById(followEntity.getFollowReceivedUserId()).orElseThrow(()->new SocialTodoException(ErrorCode.USER_NOT_FOUND));
 
             userDtoList.add(
-                UserFollowInfoDto.builder()
-                    .id(userEntity.getId())
-                    .pkIdInFollowEntity(followEntity.getId())
-                    .nickname(userEntity.getNickname())
-                    .statusMessage(userEntity.getStatusMessage())
-                    .registeredAt(CommonUtils.dateToString(userEntity.getRegisteredAt()))
-                    .build()
+                UserFollowInfoDto.fromEntity(userEntity, followEntity)
             );
         }
         return userDtoList;

@@ -54,43 +54,17 @@ public class CommonUtils {
     }
 
     /**
-     * 특정 유저가 자신이 공개한 투두의 할 일을 끝냈을 경우, 그 유저를 팔로우 하고 있는 다른 유저들에게
-     * "? 님이 할 일을 끝냈습니다."라는 일림이 간다.
+     * 특정 유저가 잔소리를 했을 경우 "? 명이 잔소리를 해줬습니다."라는 알림이 온다.
      * */
-    public static String makePublicTodoFinishAlarm(String finishedUserNickname){
-        return finishedUserNickname + " 님이 할 일을 끝냈습니다.";
+    public static String makeNagAlarmMessage(){
+        return " 명이 잔소리를 해줬습니다.";
     }
 
     /**
-     * 특정 유저가 잔소리를 했을 경우 "? 님이 잔소리를 해줬습니다."라는 알림이 온다.
+     * 특정 유저가 응원을 했을 경우 "? 명이 응원을 해줬습니다."라는 알림이 온다.
      * */
-    public static String makeOneNagAlarmMessage(String nagSendUserNickname){
-        return nagSendUserNickname + " 님이 잔소리를 해줬습니다.";
-    }
-
-    /**
-     * 동일한 공개 투두 아이템에 대하여 다수의 유저들이 잔소리를 했을 경우 새로운 알림이 오는 것이 아니라,
-     * "? 님 외 ? 명이 잔소리를 해줬습니다"
-     * 라는 방식으로 기존에 최초로 왔던 알림이 수정된다.
-     * */
-    public static String makeManyNagAlarmMessage(String firstNagSendUserNickname, Long numberOfNagSendUsers){
-        return firstNagSendUserNickname + " 님 외 " + numberOfNagSendUsers + " 명이 잔소리를 해줬습니다.";
-    }
-
-    /**
-     * 특정 유저가 응원을 했을 경우 "? 님이 응원을 해줬습니다."라는 알림이 온다.
-     * */
-    public static String makeOneSupportAlarmMessage(String supportSendUserNickname){
-        return supportSendUserNickname + " 님이 응원을 해줬습니다.";
-    }
-
-    /**
-     * 동일한 공개 투두 아이템에 대하여 다수의 유저들이 응원을 했을 경우 새로운 알림이 오는 것이 아니라,
-     * "? 님 외 ? 명이 응원을 해줬습니다"
-     * 라는 방식으로 기존에 최초로 왔던 알림이 수정된다.
-     * */
-    public static String makeManySupportAlarmMessage(String firstSupportSendUserNickname, Long numberOfSupportSendUsers){
-        return firstSupportSendUserNickname + " 님 외 " + numberOfSupportSendUsers + " 명이 응원을 해줬습니다.";
+    public static String makeSupportAlarmMessage(){
+        return " 명이 응원을 해줬습니다.";
     }
 
 }

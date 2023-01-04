@@ -24,6 +24,7 @@ public class SupportNagNumberEntity {
      * @GeneratedValue 를 쓰지 않는다.
      * 대신 공개 투두가 생성될 때마다 이쪽 엔티티와 리포지토리에도 주키를 공개 투두 아이템의 주키로
      * 매핑해주는 작업을 빼먹지 않고 수행해야 한다.
+     * PublicTodoEntity가 삭제될 때, 해당 엔티티에 대응되는 SupportNagNumberEntity도 항상 같이 삭제해 줘야 한다.
      * */
     @Id
     private Long id_DependsOnPublicTodoPK;

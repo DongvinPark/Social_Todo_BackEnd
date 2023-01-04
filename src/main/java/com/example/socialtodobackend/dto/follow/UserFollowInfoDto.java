@@ -21,8 +21,6 @@ public class UserFollowInfoDto {
 
     private String nickname;
 
-    private String emailAddr;
-
     private String statusMessage;
 
     private String registeredAt;
@@ -32,8 +30,6 @@ public class UserFollowInfoDto {
     /**
      * 회원 가입시 프런트 엔드로부터 들어오는 UserDto에서는 이메일 주소가 포함될 수 있지만, 백엔드에서 유저 정보를 프런트엔드로 넘길 때는 이메일 주소를 넘기지 말아야 한다.
      * 이메일 주소는 로그인 시 사용되는 아이디이기 때문에 누구에게나 공개되어도 괜찮은 정보는 아니다.
-     * <br><br/>
-     *
      * */
     public static UserDto fromEntity(UserEntity userEntity){
         return UserDto.builder()

@@ -23,13 +23,13 @@ public class PublicTodoDto {
 
     private String publicTodoContent;
 
+    private boolean isFinished;
+
     private String createdAt;
 
     private String modifiedAt;
 
     private String deadlineDate;
-
-    private boolean isFinished;
 
     public static PublicTodoDto fromEntity(PublicTodoEntity publicTodoEntity){
         return PublicTodoDto.builder()

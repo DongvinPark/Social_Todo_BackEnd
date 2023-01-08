@@ -1,7 +1,8 @@
 package com.example.socialtodobackend.dto.publictodo;
 
 import com.example.socialtodobackend.entity.PublicTodoEntity;
-import com.example.socialtodobackend.utils.CommonUtils;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,11 +26,15 @@ public class PublicTodoDto {
 
     private boolean isFinished;
 
-    private String createdAt;
+    private LocalDateTime createdAt;
 
-    private String modifiedAt;
+    private LocalDateTime modifiedAt;
 
-    private String deadlineDate;
+    private LocalDate deadlineDate;
+
+    private Long numberOfSupport;
+
+    private Long numberOfNag;
 
     public static PublicTodoDto fromEntity(PublicTodoEntity publicTodoEntity){
         return PublicTodoDto.builder()
@@ -37,10 +42,12 @@ public class PublicTodoDto {
             .authorUserPKId(publicTodoEntity.getAuthorUserId())
             .authorUserNickname(publicTodoEntity.getAuthorNickname())
             .publicTodoContent(publicTodoEntity.getTodoContent())
-            .createdAt(CommonUtils.dateToString(publicTodoEntity.getCreatedAt()))
-            .modifiedAt(CommonUtils.dateToString(publicTodoEntity.getModifiedAt()))
-            .deadlineDate(CommonUtils.dateToString(publicTodoEntity.getDeadlineDate()))
+            .createdAt(publicTodoEntity.getCreatedAt())
+            .modifiedAt(publicTodoEntity.getModifiedAt())
+            .deadlineDate(publicTodoEntity.getDeadlineDate())
             .isFinished(publicTodoEntity.isFinished())
+            .numberOfSupport(publicTodoEntity.getNumberOfSupport())
+            .numberOfNag(publicTodoEntity.getNumberOfNag())
             .build();
     }
 

@@ -1,7 +1,8 @@
 package com.example.socialtodobackend.dto.privatetodo;
 
 import com.example.socialtodobackend.entity.PrivateTodoEntity;
-import com.example.socialtodobackend.utils.CommonUtils;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,13 +23,13 @@ public class PrivateTodoDto {
 
     private String todoContent;
 
-    private String deadlineDate;
+    private LocalDate deadlineDate;
 
     private boolean isFinished;
 
-    private String createdAt;
+    private LocalDateTime createdAt;
 
-    private String modifiedAt;
+    private LocalDateTime modifiedAt;
 
 
     public static PrivateTodoDto fromEntity(PrivateTodoEntity entity){
@@ -36,10 +37,10 @@ public class PrivateTodoDto {
             .id(entity.getId())
             .authorUserId(entity.getAuthorUserId())
             .todoContent(entity.getTodoContent())
-            .deadlineDate(CommonUtils.dateToString(entity.getDeadlineDate()))
+            .deadlineDate(entity.getDeadlineDate())
             .isFinished(entity.isFinished())
-            .createdAt(CommonUtils.dateToString(entity.getCreatedAt()))
-            .modifiedAt(CommonUtils.dateToString(entity.getModifiedAt()))
+            .createdAt(entity.getCreatedAt())
+            .modifiedAt(entity.getModifiedAt())
             .build();
     }
 

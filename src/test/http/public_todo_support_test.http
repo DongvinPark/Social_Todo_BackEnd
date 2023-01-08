@@ -4,22 +4,22 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "authorUserPKId" : 1,
-  "authorUserNickname" : "one",
+  "authorUserPKId" : 4,
+  "authorUserNickname" : "four",
   "publicTodoContent" : "develop Social Todo App BackEnd",
   "deadlineDate" : "2023-01-31"
 }
 
 
 
-### user1 post publicTodo 2
+### user1,2,3,4 post publicTodo 2
 POST http://localhost:8080/create/public/todo
 Content-Type: application/json
 Accept: application/json
 
 {
-  "authorUserPKId" : 1,
-  "authorUserNickname" : "one",
+  "authorUserPKId" : 4,
+  "authorUserNickname" : "four",
   "publicTodoContent" : "work2",
   "deadlineDate" : "2023-01-31"
 }
@@ -28,7 +28,7 @@ Accept: application/json
 
 
 ### user2,3,4 press support/nag on publicTodo 1
-PUT http://localhost:8080/create/nag
+PUT http://localhost:8080/create/support
 Content-Type: application/json
 
 {
@@ -39,18 +39,18 @@ Content-Type: application/json
 
 
 ### user1 checks the support/nag pressed users
-GET http://localhost:8080/get/nag/users/1
+GET http://localhost:8080/support/users/1
 
 
 
 
 ### user2,3,4 canceled support/nag
-PUT http://localhost:8080/cancel/nag
+PUT http://localhost:8080/cancel/support
 Content-Type: application/json
 
 {
   "publicTodoPKId" : 1,
-  "supportNagSentUserPKId" : 4
+  "supportNagSentUserPKId" : 2
 }
 
 
@@ -63,10 +63,10 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "publicTodoPKId": 2,
-  "authorUserPKId": 1,
-  "deadlineDate": "2023-01-04",
-  "finished": false
+  "publicTodoPKId": 8,
+  "authorUserPKId": 4,
+  "deadlineDate": "2023-01-08",
+  "finished": true
 }
 
 
@@ -80,4 +80,10 @@ Content-Type: application/json
   "publicTodoPKId": 1,
   "authorUserPKId": 1
  }
+
+
+
+
+### user3 requested his/her timeline
+GET http://localhost:8080/time-line/2
 

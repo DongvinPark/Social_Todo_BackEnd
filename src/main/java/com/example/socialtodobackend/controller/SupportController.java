@@ -1,5 +1,6 @@
 package com.example.socialtodobackend.controller;
 
+import com.example.socialtodobackend.dto.APIDataResponse;
 import com.example.socialtodobackend.dto.SupportNagDto;
 import com.example.socialtodobackend.dto.UserDto;
 import com.example.socialtodobackend.service.AlarmService;
@@ -24,11 +25,8 @@ public class SupportController {
     public void pressSupport(
         @RequestBody SupportNagDto supportNagDto
     ){
-        boolean result = supportService.addSupport(supportNagDto);
-        //응원 수치 +1이 성공했을 때만 알림을 보내야 한다.
-        if(result){
-            alarmService.sendSupportInfoAlarm(supportNagDto);
-        }
+        supportService.addSupport(supportNagDto);
+        alarmService.sendSupportInfoAlarm(supportNagDto);
     }
 
 
@@ -42,11 +40,13 @@ public class SupportController {
 
 
 
-    @GetMapping("/get/support/users/{publicTodoPKId}")
-    public List<UserDto> getSupportSentUsers(
+    @GetMapping("/support/users/{publicTodoPKId}")
+    public APIDataResponse< List<UserDto> > getSupportSentUsers(
         @PathVariable Long publicTodoPKId
     ){
-        return supportService.getAllSupportSentUsers(publicTodoPKId);
+        return APIDataResponse.of(
+            supportService.getAllSupportSentUsers(publicTodoPKId)
+        );
     }
 
 

@@ -2,26 +2,26 @@ package com.example.socialtodobackend.service;
 
 import com.example.socialtodobackend.dto.SupportNagDto;
 import com.example.socialtodobackend.dto.UserDto;
+import com.example.socialtodobackend.entity.PublicTodoEntity;
 import com.example.socialtodobackend.entity.SupportEntity;
-import com.example.socialtodobackend.entity.SupportNagNumberEntity;
 import com.example.socialtodobackend.entity.UserEntity;
 import com.example.socialtodobackend.exception.SocialTodoException;
-import com.example.socialtodobackend.repository.PublicTodoSupportNagNumberRepository;
+import com.example.socialtodobackend.repository.PublicTodoRepository;
 import com.example.socialtodobackend.repository.SupportRepository;
 import com.example.socialtodobackend.repository.UserRepository;
 import com.example.socialtodobackend.type.ErrorCode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class SupportService {
 
-    private final PublicTodoSupportNagNumberRepository publicTodoSupportNagNumberRepository;
+    private final PublicTodoRepository publicTodoRepository;
     private final SupportRepository supportRepository;
     private final UserRepository userRepository;
 
@@ -32,14 +32,15 @@ public class SupportService {
      * */
     @Transactional
     public boolean addSupport(SupportNagDto supportNagDto) {
-        SupportNagNumberEntity supportNagNumberEntity = publicTodoSupportNagNumberRepository.findById(supportNagDto.getPublicTodoPKId()).orElseThrow(
+        PublicTodoEntity publicTodoEntity = publicTodoRepository.findById(supportNagDto.getPublicTodoPKId()).orElseThrow(
             () -> new SocialTodoException(ErrorCode.PUBLIC_TODO_NOT_FOUND)
         );
 
-        long supportNumber = supportNagNumberEntity.getNumberOfSupport();
+        long supportNumber = publicTodoEntity.getNumberOfSupport();
         supportNumber++;
-        supportNagNumberEntity.setNumberOfSupport(supportNumber);
-        publicTodoSupportNagNumberRepository.save(supportNagNumberEntity);
+        publicTodoEntity.setNumberOfSupport(supportNumber);
+
+        publicTodoRepository.save(publicTodoEntity);
 
         supportRepository.save(
             SupportEntity.builder()
@@ -60,15 +61,16 @@ public class SupportService {
      * */
     @Transactional
     public boolean undoSupport(SupportNagDto supportNagDto) {
-        SupportNagNumberEntity supportNagNumberEntity = publicTodoSupportNagNumberRepository.findById(supportNagDto.getPublicTodoPKId()).orElseThrow(
+        PublicTodoEntity publicTodoEntity = publicTodoRepository.findById(supportNagDto.getPublicTodoPKId()).orElseThrow(
             () -> new SocialTodoException(ErrorCode.PUBLIC_TODO_NOT_FOUND)
         );
 
-        long supportNumber = supportNagNumberEntity.getNumberOfSupport();
+        long supportNumber = publicTodoEntity.getNumberOfSupport();
         if(supportNumber == 0) throw new SocialTodoException(ErrorCode.CANNOT_DECREASE_SUPPORT_NUMBER_BELLOW_ZERO);
         supportNumber--;
-        supportNagNumberEntity.setNumberOfSupport(supportNumber);
-        publicTodoSupportNagNumberRepository.save(supportNagNumberEntity);
+        publicTodoEntity.setNumberOfSupport(supportNumber);
+
+        publicTodoRepository.save(publicTodoEntity);
 
         supportRepository.deleteByPublishedTodoPKIdAndSupportSentUserPKId(
             supportNagDto.getPublicTodoPKId(), supportNagDto.getSupportNagSentUserPKId()
@@ -81,7 +83,7 @@ public class SupportService {
     /**
      * 특정한 공개 투두 아이템에 대하여 응원을 해준 사람들의 목록을 확인할 수 있다.
      * */
-    @Transactional
+    @Transactional(readOnly = true)
     public List<UserDto> getAllSupportSentUsers(Long publicTodoPKId) {
         List<UserDto> supportUserDtoList = new ArrayList<>();
 

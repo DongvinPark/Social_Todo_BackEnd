@@ -1,7 +1,9 @@
 package com.example.socialtodobackend.dto.privatetodo;
 
+import java.time.LocalDate;
 import javax.validation.constraints.NotNull;
 import lombok.Getter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter
 public class PrivateTodoUpdateRequest {
@@ -14,8 +16,8 @@ public class PrivateTodoUpdateRequest {
     @NotNull
     private String todoContent;
 
-    @NotNull
-    private String deadlineDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate deadlineDate;
 
     @NotNull
     private boolean finished;

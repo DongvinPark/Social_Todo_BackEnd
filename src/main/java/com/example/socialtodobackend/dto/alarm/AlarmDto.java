@@ -1,7 +1,7 @@
 package com.example.socialtodobackend.dto.alarm;
 
 import com.example.socialtodobackend.entity.AlarmEntity;
-import com.example.socialtodobackend.utils.CommonUtils;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,9 +29,9 @@ public class AlarmDto {
 
     private String alarmContent;
 
-    private String createdAt;
+    private LocalDateTime createdAt;
 
-    private String modifiedAt;
+    private LocalDateTime modifiedAt;
 
 
     public static AlarmDto fromEntity(AlarmEntity alarmEntity){
@@ -43,8 +43,8 @@ public class AlarmDto {
             .relatedPublicTodoPKId(alarmEntity.getRelatedPublicTodoPKId())
             .alarmType(alarmEntity.getAlarmType().toString())
             .alarmContent(alarmEntity.getAlarmContent())
-            .createdAt(CommonUtils.dateToString(alarmEntity.getCreatedAt()))
-            .modifiedAt(CommonUtils.dateToString(alarmEntity.getModifiedAt()))
+            .createdAt(alarmEntity.getCreatedAt())
+            .modifiedAt(alarmEntity.getModifiedAt())
             .build();
     }
 

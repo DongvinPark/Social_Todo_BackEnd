@@ -1,7 +1,7 @@
 package com.example.socialtodobackend.dto;
 
 import com.example.socialtodobackend.entity.UserEntity;
-import com.example.socialtodobackend.utils.CommonUtils;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,7 +23,7 @@ public class UserDto {
 
     private String statusMessage;
 
-    private String registeredAt;
+    private LocalDateTime registeredAt;
 
 
 
@@ -37,7 +37,7 @@ public class UserDto {
             .id(userEntity.getId())
             .nickname(userEntity.getNickname())
             .statusMessage(userEntity.getStatusMessage())
-            .registeredAt(CommonUtils.dateToString(userEntity.getRegisteredAt()))
+            .registeredAt(userEntity.getRegisteredAt())
             .build();
     }
 

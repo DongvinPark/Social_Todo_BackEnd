@@ -45,21 +45,26 @@ POST http://localhost:8080/follow
 Content-Type: application/json
 
 {
-    "followSentUserPKId": 2,
-    "followReceivedUserPKId": 1
+    "followSentUserPKId": 3,
+    "followReceivedUserPKId": 2
 }
 
 
 
 ### check followees of user3
-GET http://localhost:8080/get/followee/1
+GET http://localhost:8080/followees/3
 
 
 
 ### check followers of user1,2
-GET http://localhost:8080/get/follower/2
+GET http://localhost:8080/followers/1
 
 
 
 ### user3 ufollows user1,2
-DELETE http://localhost:8080/unfollow/4
+DELETE http://localhost:8080/delete/follow-relation/2
+
+
+
+### user3 search users by nickname containing "one";
+GET http://localhost:8080/search/users/two

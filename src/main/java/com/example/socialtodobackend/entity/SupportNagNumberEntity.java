@@ -29,6 +29,8 @@ public class SupportNagNumberEntity {
     @Id
     private Long id_DependsOnPublicTodoPK;
 
+    private Long authorUserPKId;
+
     private Long numberOfSupport;
     private Long numberOfNag;
 

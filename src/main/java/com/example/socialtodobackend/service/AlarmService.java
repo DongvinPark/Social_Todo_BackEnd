@@ -1,8 +1,8 @@
 package com.example.socialtodobackend.service;
 
+import com.example.socialtodobackend.dto.SupportNagDto;
 import com.example.socialtodobackend.dto.alarm.AlarmDto;
 import com.example.socialtodobackend.dto.follow.FollowDto;
-import com.example.socialtodobackend.dto.SupportNagDto;
 import com.example.socialtodobackend.entity.AlarmEntity;
 import com.example.socialtodobackend.entity.PublicTodoEntity;
 import com.example.socialtodobackend.entity.UserEntity;
@@ -16,9 +16,9 @@ import com.example.socialtodobackend.utils.CommonUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +32,9 @@ public class AlarmService {
 
     /**
      * 특정 유저의 모든 알림을 가져온다.
+     * 이것도 페이징이 필요하다.
      * */
-    @Transactional
+    @Transactional(readOnly = true)
     public List<AlarmDto> getAlarmList(Long userPKId) {
         if(!userRepository.findById(userPKId).isPresent()){
             throw new SocialTodoException(ErrorCode.USER_NOT_FOUND);

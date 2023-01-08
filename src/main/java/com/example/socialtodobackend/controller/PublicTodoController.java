@@ -1,5 +1,6 @@
 package com.example.socialtodobackend.controller;
 
+import com.example.socialtodobackend.dto.APIDataResponse;
 import com.example.socialtodobackend.dto.publictodo.PublicTodoCreateRequest;
 import com.example.socialtodobackend.dto.publictodo.PublicTodoDeleteRequest;
 import com.example.socialtodobackend.dto.publictodo.PublicTodoDto;
@@ -29,46 +30,47 @@ public class PublicTodoController {
 
 
     @PostMapping("/create/public/todo")
-    public List<PublicTodoDto> createPublicTodo(
+    public APIDataResponse< List<PublicTodoDto> > createPublicTodo(
         @RequestBody @Valid PublicTodoCreateRequest publicTodoCreateRequest
     ){
         publicTodoService.addPublicTodo(publicTodoCreateRequest);
-        return publicTodoService.getAllPublicTodo(publicTodoCreateRequest.getAuthorUserPKId());
+        return APIDataResponse.of(
+            publicTodoService.getAllPublicTodo(publicTodoCreateRequest.getAuthorUserPKId())
+        );
     }
 
 
 
 
-    @GetMapping("/get/public/todo/{authorUserPKId}")
-    public List<PublicTodoDto> getAllPublicTodoList(
+    @GetMapping("/public/todo/{authorUserPKId}")
+    public APIDataResponse< List<PublicTodoDto> > getAllPublicTodoList(
         @PathVariable Long authorUserPKId
     ){
-        return publicTodoService.getAllPublicTodo(authorUserPKId);
+        return APIDataResponse.of(
+            publicTodoService.getAllPublicTodo(authorUserPKId)
+        );
     }
 
 
 
 
     @PutMapping("/update/public/todo")
-    public List<PublicTodoDto> updatePublicTodo(
+    public void updatePublicTodo(
         @RequestBody @Valid PublicTodoUpdateRequest publicTodoDto
     ){
         publicTodoService.updatePublicTodo(publicTodoDto);
-
-        return publicTodoService.getAllPublicTodo(publicTodoDto.getAuthorUserPKId());
     }
 
 
 
 
     @DeleteMapping("/delete/public/todo")
-    public List<PublicTodoDto> deletePublicTodo(
+    public void deletePublicTodo(
         @RequestBody @Valid PublicTodoDeleteRequest publicTodoDeleteRequest
     ){
         //디데이가 오늘인데, 아직도 완료처리되지 못한 공개 투투 아이템들은 타임라인 캐싱의 대상이므로 수정이 금지 된다.
         //그 외의 경우에는 삭제 가능하다.
         publicTodoService.removePublicTodo(publicTodoDeleteRequest.getPublicTodoPKId());
-        return publicTodoService.getAllPublicTodo(publicTodoDeleteRequest.getAuthorUserPKId());
     }
 
 }

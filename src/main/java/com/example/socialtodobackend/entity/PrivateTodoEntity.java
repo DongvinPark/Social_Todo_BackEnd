@@ -1,5 +1,6 @@
 package com.example.socialtodobackend.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -32,7 +33,7 @@ public class PrivateTodoEntity {
 
     private String todoContent;
 
-    private LocalDateTime deadlineDate;
+    private LocalDate deadlineDate;
 
     private boolean isFinished;
 

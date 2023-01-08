@@ -17,7 +17,7 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "id": 1,
+  "id": 2,
   "authorUserId": 1,
   "todoContent": "블루아카 플레이하고 자기 ㅎㅎ",
   "deadlineDate": "2023-01-23",
@@ -39,4 +39,4 @@ Accept: application/json
 
 
 ### get All PrivateTodo items
-GET http://localhost:8080/get/private/todos/1
+GET http://localhost:8080/private/todos/1

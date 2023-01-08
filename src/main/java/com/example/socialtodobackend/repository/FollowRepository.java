@@ -3,7 +3,9 @@ package com.example.socialtodobackend.repository;
 import com.example.socialtodobackend.entity.FollowEntity;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface FollowRepository extends JpaRepository<FollowEntity, Long> {
 
     /**
@@ -17,5 +19,10 @@ public interface FollowRepository extends JpaRepository<FollowEntity, Long> {
      * 즉, userPKId의 팔로워들은 누구인가?
      * */
     List<FollowEntity> findAllByFollowReceivedUserId(Long userPKId);
+
+    /**
+     * 특정 유저가 팔로우 하고 있는 다른 유저의 숫자를 리턴한다.
+     * */
+    Long countAllByFollowSentUserId(Long userPKId);
 
 }

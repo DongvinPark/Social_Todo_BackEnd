@@ -25,7 +25,8 @@ public enum ErrorCode {
     CANNOT_DELETE_TIMELINE_TARGET_TODO_ITEM("오늘 날짜에 타임라인에 포함되는 공개 투두 아이템은 삭제할 수 없습니다."),
     CANNOT_DECREASE_SUPPORT_NUMBER_BELLOW_ZERO("응원 숫자는 0보다 작아질 수 없습니다."),
     CANNOT_DECREASE_NAG_NUMBER_BELLOW_ZERO("잔소리 숫자는 0보다 작아질 수 없습니다."),
-    INVALID_REQUEST("잘못된 요청입니다.");
+    INVALID_REQUEST("잘못된 요청입니다."),
+    INVALID_NICKNAME("닉네임은 영소문자 또는 숫자만 가능합니다.");
 
     private final String description;
 }

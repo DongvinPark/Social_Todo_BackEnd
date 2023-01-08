@@ -8,14 +8,12 @@ import com.example.socialtodobackend.entity.PrivateTodoEntity;
 import com.example.socialtodobackend.exception.SocialTodoException;
 import com.example.socialtodobackend.repository.PrivateTodoRepository;
 import com.example.socialtodobackend.type.ErrorCode;
-import com.example.socialtodobackend.utils.CommonUtils;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +30,6 @@ public class PrivateTodoService {
         PrivateTodoCreateRequest privateTodoCreateRequest
     ) {
         validateContentLength(privateTodoCreateRequest.getTodoContent());
-        validateDateFormat(privateTodoCreateRequest.getDeadlineDate());
         validateDeadlineDate(privateTodoCreateRequest.getDeadlineDate());
 
         privateTodoRepository.save(
@@ -40,7 +37,7 @@ public class PrivateTodoService {
                 .authorUserId(privateTodoCreateRequest.getAuthorUserId())
                 .todoContent(privateTodoCreateRequest.getTodoContent())
                 .isFinished(false)
-                .deadlineDate(CommonUtils.stringToDate(privateTodoCreateRequest.getDeadlineDate()))
+                .deadlineDate(privateTodoCreateRequest.getDeadlineDate())
                 .build()
         );
 
@@ -53,7 +50,7 @@ public class PrivateTodoService {
      * 특정한 사용자가 작성한 모든 프라이빗 투두 아이템 리스트를 반환한다.
      * 인증 기능을 도입할 때, 내가 쓴 것만 확인할 수 있도록 조치해야 한다.
      * */
-    @Transactional
+    @Transactional(readOnly = true)
     public List<PrivateTodoDto> getAllPrivateTodo(long authorUserPKId) {
         return privateTodoRepository.findAllByAuthorUserId(authorUserPKId).stream().map(PrivateTodoDto::fromEntity).collect(Collectors.toList());
     }
@@ -69,7 +66,7 @@ public class PrivateTodoService {
     public boolean updatePrivateTodoEntity(PrivateTodoUpdateRequest privateTodoUpdateRequest) {
 
         validateContentLength(privateTodoUpdateRequest.getTodoContent());
-        validateDateFormat(privateTodoUpdateRequest.getDeadlineDate());
+        //validateDateFormat(privateTodoUpdateRequest.getDeadlineDate());
         validateDeadlineDate(privateTodoUpdateRequest.getDeadlineDate());
 
         PrivateTodoEntity privateTodoEntity = privateTodoRepository.findById(privateTodoUpdateRequest.getId()).orElseThrow( () -> new SocialTodoException(
@@ -77,7 +74,7 @@ public class PrivateTodoService {
 
         privateTodoEntity.setTodoContent(privateTodoUpdateRequest.getTodoContent());
         privateTodoEntity.setFinished(privateTodoUpdateRequest.isFinished());
-        privateTodoEntity.setDeadlineDate(CommonUtils.stringToDate(privateTodoUpdateRequest.getDeadlineDate()));
+        privateTodoEntity.setDeadlineDate(privateTodoUpdateRequest.getDeadlineDate());
 
         privateTodoRepository.save(privateTodoEntity);
 
@@ -124,40 +121,14 @@ public class PrivateTodoService {
      * 가장 늦게 설정할 경우, 오늘로부터 365일이 지난 날짜까지 설정할 수 있다.
      * 그 이외의 디데이 설정은 전부 무효처리 한다.
      * */
-    private void validateDeadlineDate(String dateInput){
-        LocalDateTime deadlineDate = CommonUtils.stringToDate(dateInput);
-        if(deadlineDate.isBefore(LocalDateTime.now() ) ){
+    private void validateDeadlineDate(LocalDate dateInput){
+        if(dateInput.isBefore(LocalDate.now() ) ){
             throw new SocialTodoException(ErrorCode.CANNOT_SET_PRIVATE_TODO_DEADLINE_ON_PAST);
         }
-        if(deadlineDate.isAfter( LocalDateTime.now().plusDays(365) )){
+        if(dateInput.isAfter( LocalDate.now().plusDays(365) )){
             throw new SocialTodoException(ErrorCode.CANNOT_SET_PRIVATE_TODO_DEADLINE_AFTER_365DAYS);
         }
     }
-
-
-    /**
-     * "yyyy-mm-dd" 포맷의 날짜만 입력 받는다.
-     * 프런트엔드에서 유저로부터 날짜를 입력 받는 from을 제공해주므로 2022-13-01
-     * 같은 엉뚱한 날짜를 입력 받는 일은 없겠지만, SimpleDateFormat은
-     * "2022-12-31-"과 같이 날짜가 끝난 다음에 오는 다른 문자가 있어도 이를 걸러내주지
-     * 못하므로 별도로 이를 검사하는 코드를 먼저 실행하게 하였다.
-     * */
-    private void validateDateFormat(String deadlineDateString){
-        if(!Character.isDigit(
-            deadlineDateString.charAt(deadlineDateString.length()-1)
-        )) throw new SocialTodoException(ErrorCode.INVALID_DEADLINE_DATE_FORMAT);
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        dateFormat.setLenient(false);
-        try{
-            dateFormat.parse(deadlineDateString);
-        }
-        catch (Exception e){
-            throw new SocialTodoException(ErrorCode.INVALID_DEADLINE_DATE_FORMAT);
-        }
-    }
-
-
 
 }
 

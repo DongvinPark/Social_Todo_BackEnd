@@ -1,5 +1,6 @@
 package com.example.socialtodobackend.controller;
 
+import com.example.socialtodobackend.dto.APIDataResponse;
 import com.example.socialtodobackend.dto.alarm.AlarmDeleteRequest;
 import com.example.socialtodobackend.dto.alarm.AlarmDto;
 import com.example.socialtodobackend.service.AlarmService;
@@ -19,11 +20,11 @@ public class AlarmController {
     private final AlarmService alarmService;
 
 
-    @GetMapping("get/alarms/{userPKId}")
-    public List<AlarmDto> getAllAlarm(
+    @GetMapping("/alarms/{userPKId}")
+    public APIDataResponse< List<AlarmDto> > getAllAlarm(
         @PathVariable Long userPKId
     ){
-        return alarmService.getAlarmList(userPKId);
+        return APIDataResponse.of(alarmService.getAlarmList(userPKId));
     }
 
 
@@ -36,21 +37,25 @@ public class AlarmController {
 
 
 
+    /**
+     * 알림 하나를 삭제하는 동작을 마친 후, 굳이 전체 알림 리스트를 다시 불러오는 동작을 할 필요는 없다.
+     * */
     @DeleteMapping("/delete/alarm")
-    public List<AlarmDto> deleteOneAlarm(
+    public void deleteOneAlarm(
         @RequestBody @Valid AlarmDeleteRequest alarmDto
     ){
         alarmService.removeOneAlarm(alarmDto.getAlarmEntityPKId());
-        return alarmService.getAlarmList(alarmDto.getAlarmReceiveUserPKId());
     }
 
 
-
-    @DeleteMapping("/delete/alarms/{userPKId}")
-    public List<AlarmDto> deleteAllAlarms(
+    /**
+     * 전체 알림을 삭제하는 동작을 마친 후, 굳이 다시 알림 리스트를 불러오는 동작을 할 필요는 없다.
+     * */
+    @DeleteMapping("/delete/entire-alarms/{userPKId}")
+    public void deleteAllAlarms(
         @PathVariable Long userPKId
     ){
-        return alarmService.removeAllAlarm(userPKId);
+        alarmService.removeAllAlarm(userPKId);
     }
 
 }

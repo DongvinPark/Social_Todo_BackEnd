@@ -1,5 +1,6 @@
 package com.example.socialtodobackend.utils;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -13,7 +14,7 @@ public class CommonUtils {
      * 한 명의 유저가 팔로우 할 수 있는 다른 유저의 수는 최대 5,000명 까지다.
      * 그러나 한 명의 유저가 확보할 수 있는 팔로워의 숫자에는 제한이 없다.
      * */
-    public static final int FOLLOW_LIMIT = 5_000;
+    public static final long FOLLOW_LIMIT = 5_000;
 
 
     /**
@@ -27,15 +28,12 @@ public class CommonUtils {
     /**
      * "yyyy-mm-dd" 포맷의 스트링을 LocalDateTime 객체로 변환하여 리턴한다.
      * */
-    public static LocalDateTime stringToDate(String dateString){
+    public static LocalDate stringToDate(String dateString){
         String[] dateInfos = dateString.split("-");
-        return LocalDateTime.of(
+        return LocalDate.of(
             Integer.parseInt(dateInfos[0]),
             Integer.parseInt(dateInfos[1]),
-            Integer.parseInt(dateInfos[2]),
-            23,
-            59,
-            59
+            Integer.parseInt(dateInfos[2])
         );
     }
 

@@ -4,21 +4,17 @@ import com.example.socialtodobackend.dto.publictodo.PublicTodoCreateRequest;
 import com.example.socialtodobackend.dto.publictodo.PublicTodoDto;
 import com.example.socialtodobackend.dto.publictodo.PublicTodoUpdateRequest;
 import com.example.socialtodobackend.entity.PublicTodoEntity;
-import com.example.socialtodobackend.entity.SupportNagNumberEntity;
 import com.example.socialtodobackend.exception.SocialTodoException;
 import com.example.socialtodobackend.repository.PublicTodoRepository;
-import com.example.socialtodobackend.repository.PublicTodoSupportNagNumberRepository;
 import com.example.socialtodobackend.repository.UserRepository;
 import com.example.socialtodobackend.type.ErrorCode;
-import com.example.socialtodobackend.utils.CommonUtils;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
-import javax.transaction.Transactional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,26 +23,21 @@ public class PublicTodoService {
 
     private final PublicTodoRepository publicTodoRepository;
     private final UserRepository userRepository;
-    private final PublicTodoSupportNagNumberRepository publicTodoSupportNagNumberRepository;
 
 
     /**
      * 특정 유저가 작성한 모든 공개 투두 아이템들을 읽어들인다.
+     * 이때, 공개 투두 아이템 각각에 대한 응원/잔소리 정보도 같이 줘야 한다.
      * */
-    @Transactional
+    @Transactional(readOnly = true)
     public List<PublicTodoDto> getAllPublicTodo(Long authorUserPKId) {
-        if(!userRepository.findById(authorUserPKId).isPresent()){
+        if(!userRepository.existsById(authorUserPKId)){
             throw new SocialTodoException(ErrorCode.USER_NOT_FOUND);
         }
 
-        List<PublicTodoDto> publicTodoDtoList = new ArrayList<>();
-        for(PublicTodoEntity publicTodoEntity : publicTodoRepository.findAllByAuthorUserId(authorUserPKId)){
-            publicTodoDtoList.add(
-                PublicTodoDto.fromEntity(publicTodoEntity)
-            );
-        }
-
-        return publicTodoDtoList;
+        return publicTodoRepository.findAllByAuthorUserId(authorUserPKId).stream().map(
+            PublicTodoDto::fromEntity).collect(
+            Collectors.toList());
     }
 
 
@@ -65,23 +56,15 @@ public class PublicTodoService {
         }
 
         validateContentLength(publicTodoCreateRequest.getPublicTodoContent());
-        validateDateFormat(publicTodoCreateRequest.getDeadlineDate());
         validateDeadlineDate(publicTodoCreateRequest.getDeadlineDate());
 
-        PublicTodoEntity savedEntity = publicTodoRepository.save(
+        publicTodoRepository.save(
             PublicTodoEntity.builder()
                 .authorUserId(publicTodoCreateRequest.getAuthorUserPKId())
                 .authorNickname(publicTodoCreateRequest.getAuthorUserNickname())
                 .todoContent(publicTodoCreateRequest.getPublicTodoContent())
-                .deadlineDate(CommonUtils.stringToDate(publicTodoCreateRequest.getDeadlineDate()))
-                .isFinished(false)
-                .build()
-        );
-
-        publicTodoSupportNagNumberRepository.save(
-            SupportNagNumberEntity.builder()
-                //방금 저장한 공개 투두 엔티티 주키와 동일한 주키 값을 가지도록 매핑해야 한다!!
-                .id_DependsOnPublicTodoPK(savedEntity.getId())
+                .deadlineDate(publicTodoCreateRequest.getDeadlineDate())
+                .finished(false)
                 .numberOfSupport(0L)
                 .numberOfNag(0L)
                 .build()
@@ -116,20 +99,18 @@ public class PublicTodoService {
             throw new SocialTodoException(ErrorCode.CANNOT_UPDATE_FINISHED_PUBLIC_TODO_ITEM);
         }
 
-        //찾아낸 원본 엔티티의 마감 기한이 오늘인 경우를 처리한다.
+        //찾아낸 원본 엔티티의 마감 기한이 오늘인 경우를 처리한다. 이때는 오직 '완료처리'만을 할 수 있다.
         if(
-            CommonUtils.dateToString(LocalDateTime.now())
-                .equals(CommonUtils.dateToString(publicTodoEntity.getDeadlineDate()))
+            LocalDate.now()
+                .equals(publicTodoEntity.getDeadlineDate())
         ){
             publicTodoEntity.setFinished(publicTodoUpdateRequest.isFinished());
             publicTodoRepository.save(publicTodoEntity);
             log.info("마감기한 도달한 날에 할일 완료처리");
         } else {
-            //오늘이 아닌 경우를 처리한다. 즉, 마감기한이 아직 아니거나 이미 지나버린 경우다.
-            validateDateFormat(publicTodoUpdateRequest.getDeadlineDate());
             validateDeadlineDate(publicTodoUpdateRequest.getDeadlineDate());
 
-            publicTodoEntity.setDeadlineDate(CommonUtils.stringToDate(publicTodoUpdateRequest.getDeadlineDate()));
+            publicTodoEntity.setDeadlineDate(publicTodoUpdateRequest.getDeadlineDate());
             publicTodoEntity.setFinished(publicTodoUpdateRequest.isFinished());
             publicTodoRepository.save(publicTodoEntity);
         }
@@ -154,8 +135,8 @@ public class PublicTodoService {
         );
 
         if(
-            CommonUtils.dateToString(LocalDateTime.now())
-                .equals(CommonUtils.dateToString(publicTodoEntity.getDeadlineDate()))
+            LocalDate.now()
+                .equals(publicTodoEntity.getDeadlineDate())
             &&
                 !publicTodoEntity.isFinished()
         ){
@@ -163,8 +144,6 @@ public class PublicTodoService {
         }
 
         publicTodoRepository.deleteById(publicTodoPKId);
-        //publicTodoEntity에 대응되는 SupportNagNumberEntity도 항상 같이 삭제해 줘야 한다.
-        publicTodoSupportNagNumberRepository.deleteById(publicTodoPKId);
 
         return true;
     }
@@ -196,36 +175,12 @@ public class PublicTodoService {
      * 가장 늦게 설정할 경우, 오늘로부터 365일이 지난 날짜까지 설정할 수 있다.
      * 그 이외의 디데이 설정은 전부 무효처리 한다.
      * */
-    private void validateDeadlineDate(String dateInput){
-        LocalDateTime deadlineDate = CommonUtils.stringToDate(dateInput);
-        if(deadlineDate.isBefore(LocalDateTime.now() ) ){
+    private void validateDeadlineDate(LocalDate dateInput){
+        if(dateInput.isBefore(LocalDate.now() ) ){
             throw new SocialTodoException(ErrorCode.CANNOT_SET_PRIVATE_TODO_DEADLINE_ON_PAST);
         }
-        if(deadlineDate.isAfter( LocalDateTime.now().plusDays(365) )){
+        if(dateInput.isAfter( LocalDate.now().plusDays(365) )){
             throw new SocialTodoException(ErrorCode.CANNOT_SET_PRIVATE_TODO_DEADLINE_AFTER_365DAYS);
-        }
-    }
-
-
-    /**
-     * "yyyy-mm-dd" 포맷의 날짜만 입력 받는다.
-     * 프런트엔드에서 유저로부터 날짜를 입력 받는 from을 제공해주므로 2022-13-01
-     * 같은 엉뚱한 날짜를 입력 받는 일은 없겠지만, SimpleDateFormat은
-     * "2022-12-31-"과 같이 날짜가 끝난 다음에 오는 다른 문자가 있어도 이를 걸러내주지
-     * 못하므로 별도로 이를 검사하는 코드를 먼저 실행하게 하였다.
-     * */
-    private void validateDateFormat(String deadlineDateString){
-        if(!Character.isDigit(
-            deadlineDateString.charAt(deadlineDateString.length()-1)
-        )) throw new SocialTodoException(ErrorCode.INVALID_DEADLINE_DATE_FORMAT);
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        dateFormat.setLenient(false);
-        try{
-            dateFormat.parse(deadlineDateString);
-        }
-        catch (Exception e){
-            throw new SocialTodoException(ErrorCode.INVALID_DEADLINE_DATE_FORMAT);
         }
     }
 

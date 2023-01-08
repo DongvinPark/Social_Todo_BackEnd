@@ -1,5 +1,6 @@
 package com.example.socialtodobackend.controller;
 
+import com.example.socialtodobackend.dto.APIDataResponse;
 import com.example.socialtodobackend.dto.privatetodo.PrivateTodoCreateRequest;
 import com.example.socialtodobackend.dto.privatetodo.PrivateTodoDeleteRequest;
 import com.example.socialtodobackend.dto.privatetodo.PrivateTodoDto;
@@ -24,37 +25,39 @@ public class PrivateTodoController {
 
 
     @PostMapping("/create/private/todo")
-    public List<PrivateTodoDto> addPrivateTodo(
+    public APIDataResponse< List<PrivateTodoDto> > addPrivateTodo(
         @RequestBody @Valid PrivateTodoCreateRequest privateTodoCreateRequest
     ) {
         privateTodoService.createPrivateTodoEntity(privateTodoCreateRequest);
-        return privateTodoService.getAllPrivateTodo(privateTodoCreateRequest.getAuthorUserId());
+        return APIDataResponse.of(
+            privateTodoService.getAllPrivateTodo(privateTodoCreateRequest.getAuthorUserId())
+        );
     }
 
 
-    @GetMapping("/get/private/todos/{authorUserPKId}")
-    public List<PrivateTodoDto> getPrivateTodoList(
+    @GetMapping("/private/todos/{authorUserPKId}")
+    public APIDataResponse< List<PrivateTodoDto> > getPrivateTodoList(
         @PathVariable Long authorUserPKId
     ) {
-        return privateTodoService.getAllPrivateTodo(authorUserPKId);
+        return APIDataResponse.of(
+            privateTodoService.getAllPrivateTodo(authorUserPKId)
+        );
     }
 
 
     @PutMapping("/update/private/todo")
-    public List<PrivateTodoDto> updatePrivateTodo(
+    public void updatePrivateTodo(
         @RequestBody @Valid PrivateTodoUpdateRequest privateTodoUpdateRequest
     ) {
         privateTodoService.updatePrivateTodoEntity(privateTodoUpdateRequest);
-        return privateTodoService.getAllPrivateTodo(privateTodoUpdateRequest.getAuthorUserId());
     }
 
 
     @DeleteMapping("/delete/private/todo")
-    public List<PrivateTodoDto> removePrivateTodo(
+    public void removePrivateTodo(
         @RequestBody @Valid PrivateTodoDeleteRequest privateTodoDeleteRequest
     ) {
         privateTodoService.deletePrivateTodo(privateTodoDeleteRequest);
-        return privateTodoService.getAllPrivateTodo(privateTodoDeleteRequest.getAuthorUserPKId());
     }
 
 }

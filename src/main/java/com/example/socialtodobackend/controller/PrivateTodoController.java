@@ -6,15 +6,18 @@ import com.example.socialtodobackend.dto.privatetodo.PrivateTodoDeleteRequest;
 import com.example.socialtodobackend.dto.privatetodo.PrivateTodoDto;
 import com.example.socialtodobackend.dto.privatetodo.PrivateTodoUpdateRequest;
 import com.example.socialtodobackend.service.PrivateTodoService;
+import com.example.socialtodobackend.utils.CommonUtils;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -29,18 +32,21 @@ public class PrivateTodoController {
         @RequestBody @Valid PrivateTodoCreateRequest privateTodoCreateRequest
     ) {
         privateTodoService.createPrivateTodoEntity(privateTodoCreateRequest);
+        PageRequest pageRequest = PageRequest.of(0, CommonUtils.PAGE_SIZE);
         return APIDataResponse.of(
-            privateTodoService.getAllPrivateTodo(privateTodoCreateRequest.getAuthorUserId())
+            privateTodoService.getAllPrivateTodo(privateTodoCreateRequest.getAuthorUserId(), pageRequest)
         );
     }
 
 
     @GetMapping("/private/todos/{authorUserPKId}")
-    public APIDataResponse< List<PrivateTodoDto> > getPrivateTodoList(
-        @PathVariable Long authorUserPKId
+    public APIDataResponse<List<PrivateTodoDto>> getPrivateTodoList(
+        @PathVariable Long authorUserPKId,
+        @RequestParam int pageNumber
     ) {
+        PageRequest pageRequest = PageRequest.of(pageNumber, CommonUtils.PAGE_SIZE);
         return APIDataResponse.of(
-            privateTodoService.getAllPrivateTodo(authorUserPKId)
+            privateTodoService.getAllPrivateTodo(authorUserPKId, pageRequest)
         );
     }
 

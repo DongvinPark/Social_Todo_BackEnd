@@ -1,6 +1,5 @@
 package com.example.socialtodobackend.dto.follow;
 
-import com.example.socialtodobackend.entity.FollowEntity;
 import com.example.socialtodobackend.entity.UserEntity;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -18,8 +17,6 @@ public class UserFollowInfoDto {
 
     private Long id;
 
-    private Long pkIdInFollowEntity;
-
     private String nickname;
 
     private String statusMessage;
@@ -28,10 +25,9 @@ public class UserFollowInfoDto {
 
 
 
-    public static UserFollowInfoDto fromEntity(UserEntity userEntity, FollowEntity followEntity){
+    public static UserFollowInfoDto fromEntity(UserEntity userEntity){
         return UserFollowInfoDto.builder()
             .id(userEntity.getId())
-            .pkIdInFollowEntity(followEntity.getId())
             .nickname(userEntity.getNickname())
             .statusMessage(userEntity.getStatusMessage())
             .registeredAt(userEntity.getRegisteredAt())

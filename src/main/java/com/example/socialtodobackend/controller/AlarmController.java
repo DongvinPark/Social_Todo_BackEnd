@@ -4,13 +4,16 @@ import com.example.socialtodobackend.dto.APIDataResponse;
 import com.example.socialtodobackend.dto.alarm.AlarmDeleteRequest;
 import com.example.socialtodobackend.dto.alarm.AlarmDto;
 import com.example.socialtodobackend.service.AlarmService;
+import com.example.socialtodobackend.utils.CommonUtils;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -22,9 +25,11 @@ public class AlarmController {
 
     @GetMapping("/alarms/{userPKId}")
     public APIDataResponse< List<AlarmDto> > getAllAlarm(
-        @PathVariable Long userPKId
+        @PathVariable Long userPKId,
+        @RequestParam int pageNumber
     ){
-        return APIDataResponse.of(alarmService.getAlarmList(userPKId));
+        PageRequest pageRequest = PageRequest.of(pageNumber, CommonUtils.PAGE_SIZE);
+        return APIDataResponse.of(alarmService.getAlarmList(userPKId, pageRequest));
     }
 
 

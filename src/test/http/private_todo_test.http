@@ -38,5 +38,5 @@ Accept: application/json
 
 
 
-### get All PrivateTodo items
-GET http://localhost:8080/private/todos/1
+### get All PrivateTodo items with paging
+GET http://localhost:8080/private/todos/1?pageNumber=0

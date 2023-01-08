@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,14 +31,12 @@ public class PublicTodoService {
      * 이때, 공개 투두 아이템 각각에 대한 응원/잔소리 정보도 같이 줘야 한다.
      * */
     @Transactional(readOnly = true)
-    public List<PublicTodoDto> getAllPublicTodo(Long authorUserPKId) {
+    public List<PublicTodoDto> getAllPublicTodo(Long authorUserPKId, PageRequest pageRequest) {
         if(!userRepository.existsById(authorUserPKId)){
             throw new SocialTodoException(ErrorCode.USER_NOT_FOUND);
         }
 
-        return publicTodoRepository.findAllByAuthorUserId(authorUserPKId).stream().map(
-            PublicTodoDto::fromEntity).collect(
-            Collectors.toList());
+        return publicTodoRepository.findAllByAuthorUserId(authorUserPKId, pageRequest).getContent().stream().map(PublicTodoDto::fromEntity).collect(Collectors.toList());
     }
 
 

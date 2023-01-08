@@ -5,14 +5,17 @@ import com.example.socialtodobackend.dto.follow.FollowDto;
 import com.example.socialtodobackend.dto.follow.UserFollowInfoDto;
 import com.example.socialtodobackend.service.AlarmService;
 import com.example.socialtodobackend.service.FollowService;
+import com.example.socialtodobackend.utils.CommonUtils;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,18 +28,21 @@ public class FollowController {
 
     @GetMapping("/followers/{userPKId}")
     public APIDataResponse< List<UserFollowInfoDto> > getAllFollowersOfUser(
-        @PathVariable Long userPKId
+        @PathVariable Long userPKId, @RequestParam int pageNumber
     ){
-        return APIDataResponse.of( followService.getFollowers(userPKId) );
+        PageRequest pageRequest = PageRequest.of(pageNumber, CommonUtils.PAGE_SIZE);
+        return APIDataResponse.of( followService.getFollowers(userPKId, pageRequest) );
     }
 
 
 
     @GetMapping("/followees/{userPKId}")
     public APIDataResponse< List<UserFollowInfoDto> >  getAllFolloweeUsers(
-        @PathVariable Long userPKId
+        @PathVariable Long userPKId,
+        @RequestParam int pageNumber
     ){
-        return APIDataResponse.of( followService.getFollowees(userPKId) );
+        PageRequest pageRequest = PageRequest.of(pageNumber, CommonUtils.PAGE_SIZE);
+        return APIDataResponse.of( followService.getFollowees(userPKId, pageRequest) );
     }
 
 
@@ -54,15 +60,15 @@ public class FollowController {
 
 
     /**
-     * 프런트 엔드를 보고 있는 유저의 입장에서는 일단 자신이 팔로우하고 있는 유저의 리스트를 쭉 확인할 것이다.
-     * 그 리스트의 요소들은 UserFollowInfoDto에 정의한 대로 구성돼 있다.
-     * 각각의 요소들은 해당 요소들이 FollowEntity와 매핑된 DB 테이블 상에서의 주키의 값이 무엇인지의 정보가 pkIdInFollowEntity 필드로 담겨 있으므로, 언팔로우를 할 때는 pkIdInFollowEntity 번호 하나만 넘겨주면 팔로우 관계를 해지하는 것이 가능하다.
+     * 언팔로우 요청을 보내는 사용자의 주키 아이디과,
+     * 해당 사용자가 언팔로우 하고자 하는 대상 사용자의 주키 아이디를 @RequestParam으로 전달한다.
      * */
-    @DeleteMapping("/delete/follow-relation/{id}")
+    @DeleteMapping("/delete/follow-relation")
     public void deleteFollowRelation(
-        @PathVariable Long id
+        @RequestParam Long requestUserPKId,
+        @RequestParam Long unfollowTargetUserPKId
     ){
-        followService.deleteFollowInfo(id);
+        followService.deleteFollowInfo(requestUserPKId, unfollowTargetUserPKId);
     }
 
 

@@ -16,7 +16,9 @@ import com.example.socialtodobackend.utils.CommonUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,19 +37,14 @@ public class AlarmService {
      * 이것도 페이징이 필요하다.
      * */
     @Transactional(readOnly = true)
-    public List<AlarmDto> getAlarmList(Long userPKId) {
+    public List<AlarmDto> getAlarmList(Long userPKId, PageRequest pageRequest) {
         if(!userRepository.findById(userPKId).isPresent()){
             throw new SocialTodoException(ErrorCode.USER_NOT_FOUND);
         }
 
-        List<AlarmDto> alarmDtoList = new ArrayList<>();
-
-        for(AlarmEntity alarmEntity : alarmRepository.findAllByAlarmReceiverUserIdEquals(userPKId)){
-            alarmDtoList.add(
-                AlarmDto.fromEntity(alarmEntity)
-            );
-        }
-        return alarmDtoList;
+        return alarmRepository.findAllByAlarmReceiverUserIdEquals(userPKId, pageRequest).getContent().stream().map(
+            AlarmDto::fromEntity).collect(
+            Collectors.toList());
     }
 
 

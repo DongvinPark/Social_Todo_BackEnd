@@ -6,12 +6,15 @@ import com.example.socialtodobackend.dto.publictodo.PublicTodoDto;
 import com.example.socialtodobackend.entity.UserEntity;
 import com.example.socialtodobackend.repository.UserRepository;
 import com.example.socialtodobackend.service.UserService;
+import com.example.socialtodobackend.utils.CommonUtils;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -55,18 +58,20 @@ public class UserController {
 
     @GetMapping("/time-line/{userPKId}")
     public APIDataResponse< List<PublicTodoDto> > getTimeLine(
-        @PathVariable Long userPKId
+        @PathVariable Long userPKId, @RequestParam int pageNumber
     ){
-        return APIDataResponse.of(userService.makeTimeLine(userPKId));
+        PageRequest pageRequest = PageRequest.of(pageNumber, CommonUtils.PAGE_SIZE);
+        return APIDataResponse.of(userService.makeTimeLine(userPKId, pageRequest));
     }
 
 
 
     @GetMapping("/search/users/{userNickname}")
     public APIDataResponse< List<UserDto> > searchUsers(
-        @PathVariable String userNickname
+        @PathVariable String userNickname, @RequestParam int pageNumber
     ){
-        return APIDataResponse.of(userService.searchUsersByNickname(userNickname));
+        PageRequest pageRequest = PageRequest.of(pageNumber, CommonUtils.PAGE_SIZE);
+        return APIDataResponse.of(userService.searchUsersByNickname(userNickname, pageRequest));
     }
 
 

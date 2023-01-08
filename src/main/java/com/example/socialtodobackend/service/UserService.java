@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,10 +35,11 @@ public class UserService {
      * 타임라인은 유저 정보와 공개 투두 아이템 정보 모두를 레디스 캐싱하고 배치 처리까지 돌려야되는 고난도 작업이다.
      * 현재는 비효율적이겠지만 일단 구현하고나서 나중에 배포한 후에 레디스와 배치를 동원해서 최적화시킨다.
      * */
-    public List<PublicTodoDto> makeTimeLine(Long userPKId) {
+    public List<PublicTodoDto> makeTimeLine(Long userPKId, PageRequest pageRequest) {
         // userPKId 번호를 주키고 가지고 있는 유저가 팔로우를 한 다른 모든 유저들의 주키 아이디 번호를 찾아낸다.
-        List<Long> followeeUserPKIdList = followRepository.findAllByFollowSentUserId(userPKId).stream().map(FollowEntity::getFollowReceivedUserId).collect(
-            Collectors.toList());
+        // 이 숫자는 5000을 초과할 수 없으므로, 일단 전부 담아 둔다.
+        //페이징을 사용하지 않는 버전의 메서드를 호출한다.
+        List<Long> followeeUserPKIdList = followRepository.findAllByFollowSentUserId(userPKId).stream().map(FollowEntity::getFollowReceivedUserId).collect(Collectors.toList());
 
         // 위에서 찾아낸 followeeUserPKIdList 를
         // findAllByFinishedEqualsAndDeadlineDateEqualsAndAuthorUserIdIn() 메서드에 전달하여
@@ -45,8 +47,8 @@ public class UserService {
         // 작성자 주키 아이디가 followeeUserPKIdList 에 들어 있는 공개 투두 아이템을 publicTodoDto로 만들어서
         // 최종 리턴한다.
         return publicTodoRepository.findAllByFinishedIsFalseAndDeadlineDateEqualsAndAuthorUserIdIn(
-            LocalDate.now(), followeeUserPKIdList
-        ).stream().map(PublicTodoDto::fromEntity).collect(Collectors.toList());
+            LocalDate.now(), followeeUserPKIdList, pageRequest
+        ).getContent().stream().map(PublicTodoDto::fromEntity).collect(Collectors.toList());
     }
 
 
@@ -56,11 +58,10 @@ public class UserService {
      * 닉네임은 영소문자 또는 숫자로만 구성돼 있으므로 이를 어긴 검색어에 대해서는 예외를 던진다.
      * 페이징이 필요하다.
      * */
-    public List<UserDto> searchUsersByNickname(String userNickname) {
+    public List<UserDto> searchUsersByNickname(String userNickname, PageRequest pageRequest) {
         validateNicknameSearchWordString(userNickname);
 
-        return userRepository.findAllByNicknameContaining(userNickname).stream()
-            .map(UserDto::fromEntity).collect(Collectors.toList());
+        return userRepository.findAllByNicknameContaining(userNickname, pageRequest).getContent().stream().map(UserDto::fromEntity).collect(Collectors.toList());
     }
 
 

@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,8 +52,9 @@ public class PrivateTodoService {
      * 인증 기능을 도입할 때, 내가 쓴 것만 확인할 수 있도록 조치해야 한다.
      * */
     @Transactional(readOnly = true)
-    public List<PrivateTodoDto> getAllPrivateTodo(long authorUserPKId) {
-        return privateTodoRepository.findAllByAuthorUserId(authorUserPKId).stream().map(PrivateTodoDto::fromEntity).collect(Collectors.toList());
+    public List<PrivateTodoDto> getAllPrivateTodo(long authorUserPKId, PageRequest pageRequest) {
+        return privateTodoRepository.findAllByAuthorUserId(authorUserPKId, pageRequest).getContent().stream().map(PrivateTodoDto::fromEntity).collect(
+            Collectors.toList());
     }
 
 

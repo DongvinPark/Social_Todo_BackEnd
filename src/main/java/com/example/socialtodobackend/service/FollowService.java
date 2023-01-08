@@ -3,21 +3,23 @@ package com.example.socialtodobackend.service;
 import com.example.socialtodobackend.dto.follow.FollowDto;
 import com.example.socialtodobackend.dto.follow.UserFollowInfoDto;
 import com.example.socialtodobackend.entity.FollowEntity;
-import com.example.socialtodobackend.entity.UserEntity;
 import com.example.socialtodobackend.entity.UserFollowSendCountEntity;
 import com.example.socialtodobackend.exception.SocialTodoException;
 import com.example.socialtodobackend.repository.FollowRepository;
 import com.example.socialtodobackend.repository.UserRepository;
 import com.example.socialtodobackend.type.ErrorCode;
 import com.example.socialtodobackend.utils.CommonUtils;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FollowService {
 
     private final FollowRepository followRepository;
@@ -30,38 +32,43 @@ public class FollowService {
      * 이 숫자는 수 천 만 명이 될 수도 있기 때문에 DB I/O를 최소화하고 페이징 로직을 도입해야 한다.
      * */
     @Transactional(readOnly = true)
-    public List<UserFollowInfoDto> getFollowers(Long userPKId) {
-        List<UserFollowInfoDto> userDtoList = new ArrayList<>();
-        //userPKID를 팔로우한(==userPKID가 팔로우를 받게 만든) 모든 사람들을 찾는다.
-        for(FollowEntity followEntity : followRepository.findAllByFollowReceivedUserId(userPKId)){
-            //userPKID를 팔로우한 사용자를 찾는다.
-            UserEntity userEntity = userRepository.findById(followEntity.getFollowSentUserId()).orElseThrow(()->new SocialTodoException(ErrorCode.USER_NOT_FOUND));
+    public List<UserFollowInfoDto> getFollowers(Long userPKId, PageRequest pageRequest) {
+        //userPKID를 팔로우한(==userPKID가 팔로우를 받게 만든) 모든 사람들의 주키 아이디 값을 찾는다.
+        //중요한 것은 이때도 페이징이 필요하다는 것이다. 만약 어떤 유저의 팔로워 수가 1천 만 명이라면, 이것을 전부 리스트에 담는 것은
+        //서버의 메모리에 엄청난 부담을 줄 것이고, 아래에서 진행되는 유저 검색 쿼리도 비효율적으로 만들 것이기 때문이다.
+        //여기서도 페이징을 하는 것이 가능한 이유는, followSentUserPKIdList 의 요소의 숫자와 userRepository.findAllByIdIn(followSentUserPKIdList, pageRequest)
+        //의 검색 결과의 숫자가 항상 동일하며 1 대 1 매핑 관계를 이루고 있기 때문이다.
+        List<Long> followSentUserPKIdList = followRepository.findAllByFollowReceivedUserId(userPKId, pageRequest).getContent().stream().map(
+            FollowEntity::getFollowSentUserId).collect(Collectors.toList());
 
-            userDtoList.add(
-                UserFollowInfoDto.fromEntity(userEntity, followEntity)
-            );
-        }
-        return userDtoList;
+        //유저 리포지토리에서 위에서 만든 주키 아이디 리스트에 포함되는 사람들을 페이징 처리하여 보여준다. 한 페이지당 몇 명씩 보여줄지는 ComminUtils에 상수로 정의돼 있다.
+        //주키 아이디 리스트에서 페이징 처리를 해주기 때문에 유저 리포지토리에서 리턴할 결과물의 개수는
+        //위에서 넘겨 받은 followReceivedUserPKIdList의 요소의 개수와 항상 동일하다.
+        //그리고 followReceivedUserPKIdList의 요소의 개수는 1개 페이지에서 포함 가능한
+        //개수인 CommonUtils.PAGE_SIZE를 초과할 수 없다.
+        //결론은 유저리포지토리에서 탐색할 때는 무조건 0번 페이자 1개만 반환하면 된다는 것이다.
+        //왜나면, 위에서 이미 페이징을 범위를 전부 처리했기 때문이다.
+        return userRepository.findAllByIdIn(followSentUserPKIdList, PageRequest.of(0, CommonUtils.PAGE_SIZE)).getContent().stream().map(
+            UserFollowInfoDto::fromEntity).collect(Collectors.toList());
     }
 
 
     /**
      * 특정 유저가 팔로우를 한 모든 사람들을 확인한다.
-     * 이 숫자는 최대 5000명 까지만 가능하므로 비교적 작은 숫자에 속하지만 페이징 로직은 필수적이다.
+     * 여기서도 페이징 로직을 적용한다.
      * */
     @Transactional(readOnly = true)
-    public List<UserFollowInfoDto> getFollowees(Long userPKId) {
-        List<UserFollowInfoDto> userDtoList = new ArrayList<>();
-        //userPKID가 팔로우한 모든 사람들을 찾는다.
-        for(FollowEntity followEntity : followRepository.findAllByFollowSentUserId(userPKId)){
-            //userPKID로부터 팔로우를 받은 사람을 찾는다.
-            UserEntity userEntity = userRepository.findById(followEntity.getFollowReceivedUserId()).orElseThrow(()->new SocialTodoException(ErrorCode.USER_NOT_FOUND));
+    public List<UserFollowInfoDto> getFollowees(Long userPKId, PageRequest pageRequest) {
+        //userPKID가 팔로우한 모든 사람들의 주키 아이디 리스트를 만들어둔다.
+        //이 값은 5,000을 초과할 수는 없지만, 바로 위의 getFollowers() 메서드에서 설명한 것과 동일한 이유로 여기서도 페이징을 적용한다.
+        List<Long> followReceivedUserPKIdList = followRepository.findAllByFollowSentUserId(userPKId, pageRequest).getContent().stream().map(FollowEntity::getFollowReceivedUserId).collect(Collectors.toList());
 
-            userDtoList.add(
-                UserFollowInfoDto.fromEntity(userEntity, followEntity)
-            );
-        }
-        return userDtoList;
+        log.info("팔로이 PK Id 리스트" + followReceivedUserPKIdList.toString());
+
+
+        //유저 리포지토리에서 위에서 만든 주키 아이디 리스트에 포함되는 사람들을 페이징 처리하여 보여준다.
+        return userRepository.findAllByIdIn(followReceivedUserPKIdList, PageRequest.of(0, CommonUtils.PAGE_SIZE)).getContent().stream().map(UserFollowInfoDto::fromEntity).collect(
+            Collectors.toList());
     }
 
 
@@ -97,12 +104,9 @@ public class FollowService {
      * 유저 두 명 간의 맞팔로우도 followRepository에서는 결국 서로 다른 튜플로 저장되기 때문에 문제 되지 않는다.
      * */
     @Transactional
-    public void deleteFollowInfo(Long followEntityPKId) {
+    public void deleteFollowInfo(Long requestUserPKId, Long unfollowTargetUserPKId) {
         //팔로우 정보 테이블에서 팔로우 정보가 있을 경우 삭제한다.
-        if(!followRepository.existsById(followEntityPKId)){
-            throw new SocialTodoException(ErrorCode.FOLLOW_INFO_NOT_FOUND);
-        }
-        followRepository.deleteById(followEntityPKId);
+        followRepository.deleteByFollowSentUserIdEqualsAndFollowReceivedUserIdEquals(requestUserPKId, unfollowTargetUserPKId);
 
     }
 

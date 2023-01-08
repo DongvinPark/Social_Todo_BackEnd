@@ -4,16 +4,16 @@ import com.example.socialtodobackend.dto.SupportNagDto;
 import com.example.socialtodobackend.dto.UserDto;
 import com.example.socialtodobackend.entity.PublicTodoEntity;
 import com.example.socialtodobackend.entity.SupportEntity;
-import com.example.socialtodobackend.entity.UserEntity;
 import com.example.socialtodobackend.exception.SocialTodoException;
 import com.example.socialtodobackend.repository.PublicTodoRepository;
 import com.example.socialtodobackend.repository.SupportRepository;
 import com.example.socialtodobackend.repository.UserRepository;
 import com.example.socialtodobackend.type.ErrorCode;
-import java.util.ArrayList;
+import com.example.socialtodobackend.utils.CommonUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -84,18 +84,12 @@ public class SupportService {
      * 특정한 공개 투두 아이템에 대하여 응원을 해준 사람들의 목록을 확인할 수 있다.
      * */
     @Transactional(readOnly = true)
-    public List<UserDto> getAllSupportSentUsers(Long publicTodoPKId) {
-        List<UserDto> supportUserDtoList = new ArrayList<>();
+    public List<UserDto> getAllSupportSentUsers(Long publicTodoPKId, PageRequest pageRequest) {
+        //우선, 응원을 해준 모든 유저들의 주키 아이디를 하나의 리스트로 모은다. 이때도 페이징 처리가 필요하다.
+        List<Long> supportSentUserPKIdList = supportRepository.findAllByPublishedTodoPKId(publicTodoPKId, pageRequest).getContent().stream().map(SupportEntity::getSupportSentUserPKId).collect(Collectors.toList());
 
-        //특정 공개 투두 아이템에 대하여 응원을 눌러준 모든 유저들의 주키 아이디를 모은다.
-        List<Long> userPKList = supportRepository.findAllByPublishedTodoPKId(publicTodoPKId).stream().mapToLong(SupportEntity::getSupportSentUserPKId).boxed().collect(Collectors.toList());
-
-        for(UserEntity userEntity : userRepository.findAllById(userPKList)){
-            supportUserDtoList.add(
-                UserDto.fromEntity(userEntity)
-            );
-        }
-        return supportUserDtoList;
+        //그후 유저 리포지토리에서 위에서 만든 주키 아이디 리스트에 포함되는 사람을 전부 찾아내서 페이징처리하여 보여준다.
+        return userRepository.findAllByIdIn(supportSentUserPKIdList, PageRequest.of(0, CommonUtils.PAGE_SIZE)).getContent().stream().map(UserDto::fromEntity).collect(Collectors.toList());
     }
 
 

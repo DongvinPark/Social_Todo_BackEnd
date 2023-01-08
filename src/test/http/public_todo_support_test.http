@@ -28,7 +28,7 @@ Accept: application/json
 
 
 ### user2,3,4 press support/nag on publicTodo 1
-PUT http://localhost:8080/create/support
+PUT http://localhost:8080/create/nag
 Content-Type: application/json
 
 {
@@ -38,8 +38,8 @@ Content-Type: application/json
 
 
 
-### user1 checks the support/nag pressed users
-GET http://localhost:8080/support/users/1
+### user3 checks the support/nag pressed users
+GET http://localhost:8080/nag/users/1?pageNumber=2
 
 
 
@@ -63,7 +63,7 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "publicTodoPKId": 8,
+  "publicTodoPKId": 7,
   "authorUserPKId": 4,
   "deadlineDate": "2023-01-08",
   "finished": true
@@ -77,7 +77,7 @@ DELETE localhost:8080/delete/public/todo
 Content-Type: application/json
 
 {
-  "publicTodoPKId": 1,
+  "publicTodoPKId": 2,
   "authorUserPKId": 1
  }
 
@@ -85,5 +85,5 @@ Content-Type: application/json
 
 
 ### user3 requested his/her timeline
-GET http://localhost:8080/time-line/2
+GET http://localhost:8080/time-line/3?pageNumber=1
 

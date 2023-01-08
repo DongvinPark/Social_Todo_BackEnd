@@ -16,6 +16,8 @@ public class CommonUtils {
      * */
     public static final long FOLLOW_LIMIT = 5_000;
 
+    public static final int PAGE_SIZE = 1;
+
 
     /**
      * 자바의 LocalDateTime의 기본 형태를

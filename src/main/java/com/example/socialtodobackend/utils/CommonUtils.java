@@ -2,12 +2,9 @@ package com.example.socialtodobackend.utils;
 
 import com.example.socialtodobackend.exception.SingletonException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 /**
- * 서비스 운영에 필요한 각종 상수, 유틸리티 메서드들이 모여 있다.
- * 팔로우 수 제한, 날짜와 스트링 간 변환, 알림용 메시지 작성 등의 메서들이다.
+ * 서비스 운영에 필요한 각종 상수, 유틸리티 및 검증 메서드들이 모여 있다.
  * */
 public class CommonUtils {
 
@@ -44,27 +41,6 @@ public class CommonUtils {
         if(dateInput.isAfter( LocalDate.now().plusDays(LONGEST_DEADLINE_DATE_LIMIT) )){
             throw SingletonException.CANNOT_SET_TODO_DEADLINE_AFTER_365DAYS;
         }
-    }
-
-
-    /**
-     * 자바의 LocalDateTime의 기본 형태를
-     * "yyyy-mm-dd" 포맷의 스트링으로 바꿔서 리턴한다.
-     * */
-    public static String dateToString(LocalDateTime inputDate){
-        return inputDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-    }
-
-    /**
-     * "yyyy-mm-dd" 포맷의 스트링을 LocalDateTime 객체로 변환하여 리턴한다.
-     * */
-    public static LocalDate stringToDate(String dateString){
-        String[] dateInfos = dateString.split("-");
-        return LocalDate.of(
-            Integer.parseInt(dateInfos[0]),
-            Integer.parseInt(dateInfos[1]),
-            Integer.parseInt(dateInfos[2])
-        );
     }
 
     /**

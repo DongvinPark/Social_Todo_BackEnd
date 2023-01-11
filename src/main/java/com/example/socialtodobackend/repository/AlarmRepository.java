@@ -19,6 +19,8 @@ public interface AlarmRepository extends JpaRepository<AlarmEntity, Long> {
      * */
     void deleteAllByAlarmReceiverUserIdEquals(Long id);
 
+    void deleteByIdAndAlarmReceiverUserId(Long id, Long alarmReceiverUserId);
+
     Optional<AlarmEntity> findAlarmEntityByRelatedPublicTodoPKIdEqualsAndAlarmTypeEquals(Long relatedPublicTodoPKId, AlarmTypeCode alarmTypeCode);
 
 }

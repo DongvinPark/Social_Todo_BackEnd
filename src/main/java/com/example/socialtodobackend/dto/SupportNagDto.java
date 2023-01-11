@@ -15,7 +15,4 @@ import lombok.Setter;
 public class SupportNagDto {
     @NotNull
     private Long publicTodoPKId;
-
-    @NotNull
-    private Long supportNagSentUserPKId;
 }

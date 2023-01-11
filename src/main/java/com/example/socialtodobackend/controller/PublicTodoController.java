@@ -2,10 +2,8 @@ package com.example.socialtodobackend.controller;
 
 import com.example.socialtodobackend.dto.APIDataResponse;
 import com.example.socialtodobackend.dto.publictodo.PublicTodoCreateRequest;
-import com.example.socialtodobackend.dto.publictodo.PublicTodoDeleteRequest;
 import com.example.socialtodobackend.dto.publictodo.PublicTodoDto;
 import com.example.socialtodobackend.dto.publictodo.PublicTodoUpdateRequest;
-import com.example.socialtodobackend.service.AlarmService;
 import com.example.socialtodobackend.service.PublicTodoService;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.util.List;
@@ -13,9 +11,9 @@ import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,27 +26,29 @@ import org.springframework.web.bind.annotation.RestController;
 public class PublicTodoController {
 
     private final PublicTodoService publicTodoService;
-    private final AlarmService alarmService;
 
 
 
     @PostMapping("/create/public/todo")
     public APIDataResponse< List<PublicTodoDto> > createPublicTodo(
+        @AuthenticationPrincipal Long authorUserPKId,
         @RequestBody @Valid PublicTodoCreateRequest publicTodoCreateRequest
     ){
-        publicTodoService.addPublicTodo(publicTodoCreateRequest);
+        publicTodoService.addPublicTodo(authorUserPKId, publicTodoCreateRequest);
+
         PageRequest pageRequest = PageRequest.of(0, CommonUtils.PAGE_SIZE);
+
         return APIDataResponse.of(
-            publicTodoService.getAllPublicTodo(publicTodoCreateRequest.getAuthorUserPKId(), pageRequest)
+            publicTodoService.getAllPublicTodo(authorUserPKId, pageRequest)
         );
     }
 
 
 
 
-    @GetMapping("/public/todo/{authorUserPKId}")
+    @GetMapping("/public/todo")
     public APIDataResponse< List<PublicTodoDto> > getAllPublicTodoList(
-        @PathVariable Long authorUserPKId, @RequestParam int pageNumber
+        @AuthenticationPrincipal Long authorUserPKId, @RequestParam int pageNumber
     ){
         PageRequest pageRequest = PageRequest.of(pageNumber, CommonUtils.PAGE_SIZE);
         return APIDataResponse.of(
@@ -61,9 +61,10 @@ public class PublicTodoController {
 
     @PutMapping("/update/public/todo")
     public void updatePublicTodo(
+        @AuthenticationPrincipal Long authorUserPKId,
         @RequestBody @Valid PublicTodoUpdateRequest publicTodoDto
     ){
-        publicTodoService.updatePublicTodo(publicTodoDto);
+        publicTodoService.updatePublicTodo(authorUserPKId, publicTodoDto);
     }
 
 
@@ -71,11 +72,10 @@ public class PublicTodoController {
 
     @DeleteMapping("/delete/public/todo")
     public void deletePublicTodo(
-        @RequestBody @Valid PublicTodoDeleteRequest publicTodoDeleteRequest
+        @AuthenticationPrincipal Long authorUserPKId,
+        @RequestParam Long publicTodoPKId
     ){
-        //디데이가 오늘인데, 아직도 완료처리되지 못한 공개 투투 아이템들은 타임라인 캐싱의 대상이므로 수정이 금지 된다.
-        //그 외의 경우에는 삭제 가능하다.
-        publicTodoService.removePublicTodo(publicTodoDeleteRequest.getPublicTodoPKId());
+        publicTodoService.removePublicTodo(authorUserPKId, publicTodoPKId);
     }
 
 }

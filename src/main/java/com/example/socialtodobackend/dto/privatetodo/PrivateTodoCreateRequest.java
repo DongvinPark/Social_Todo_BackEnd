@@ -7,12 +7,11 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter
 public class PrivateTodoCreateRequest {
-    @NotNull
-    private Long authorUserId;
 
     @NotNull
     private String todoContent;
 
+    @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate deadlineDate;
 }

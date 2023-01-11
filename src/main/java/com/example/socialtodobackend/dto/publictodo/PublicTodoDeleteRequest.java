@@ -5,9 +5,8 @@ import lombok.Getter;
 
 @Getter
 public class PublicTodoDeleteRequest {
+
     @NotNull
     private Long publicTodoPKId;
 
-    @NotNull
-    private Long authorUserPKId;
 }

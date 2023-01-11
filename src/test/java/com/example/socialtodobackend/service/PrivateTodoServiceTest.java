@@ -110,7 +110,7 @@ class PrivateTodoServiceTest {
         );
 
         //then
-        assertEquals(ErrorCode.CANNOT_SET_PRIVATE_TODO_DEADLINE_AFTER_365DAYS, exception.getErrorCode());
+        assertEquals(ErrorCode.CANNOT_SET_TODO_DEADLINE_AFTER_365DAYS, exception.getErrorCode());
     }
 
 

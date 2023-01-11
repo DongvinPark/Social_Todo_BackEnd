@@ -1,11 +1,11 @@
-### user1 post publicTodo 1
+### user1,2,3,4 post publicTodo 1
 POST http://localhost:8080/create/public/todo
 Content-Type: application/json
 Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwODU5OCwiZXhwIjoxNjczNDk0OTk4fQ.b2JoZW69tjW_vT06KLO2R4xff6jgbnMTwpVhr3zjLRvqKSKeOBfOWY23QtdWSJQCr4q5N1Uo-H1F9HMHXWk1mw
 
 {
-  "authorUserPKId" : 4,
-  "authorUserNickname" : "four",
+  "authorUserNickname" : "one",
   "publicTodoContent" : "develop Social Todo App BackEnd",
   "deadlineDate" : "2023-01-31"
 }
@@ -16,10 +16,10 @@ Accept: application/json
 POST http://localhost:8080/create/public/todo
 Content-Type: application/json
 Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0IiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwNDQ0MiwiZXhwIjoxNjczNDkwODQyfQ.OzI-t36MN9ggGd6_bJt3ap8vJCKguCNCSN0_Fx937RA0_nyayGrPJJhfl_snczC77q-aiti2waAu8YIMSPGWoQ
 
 {
-  "authorUserPKId" : 4,
-  "authorUserNickname" : "four",
+  "authorUserNickname" : "one",
   "publicTodoContent" : "work2",
   "deadlineDate" : "2023-01-31"
 }
@@ -27,63 +27,68 @@ Accept: application/json
 
 
 
+### user1,2,3,4 check public todo list
+GET http://localhost:8080/public/todo?pageNumber=0
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwODYyMywiZXhwIjoxNjczNDk1MDIzfQ.99Z7xfteAYV_lYMgU8xRdsdFRCC9-JzTysLoh_r5KkVS1JvWuD7olI53r10tIZ95IYqLHWRwFzgyavK87f8URw
+
+
+
+
+
 ### user2,3,4 press support/nag on publicTodo 1
-PUT http://localhost:8080/create/nag
-Content-Type: application/json
-
-{
-  "publicTodoPKId" : 1,
-  "supportNagSentUserPKId" : 4
-}
+PUT http://localhost:8080/create/nag?publicTodoPKId=1&todoAuthorUserPKId=1
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0IiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwODY2MSwiZXhwIjoxNjczNDk1MDYxfQ.Uvigqn6PVT8vYpLeIfswaRrILjyH8vosc1sF6RPvGAoPNOiz9d7D7iPYsWGzIKjHL9XkMOQGT4qJhX39nMWLPA
 
 
 
-### user3 checks the support/nag pressed users
-GET http://localhost:8080/nag/users/1?pageNumber=2
 
+
+### every users can check the support/nag pressed users
+GET http://localhost:8080/nag/users?publicTodoPKId=1&pageNumber=0
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwODYyMywiZXhwIjoxNjczNDk1MDIzfQ.99Z7xfteAYV_lYMgU8xRdsdFRCC9-JzTysLoh_r5KkVS1JvWuD7olI53r10tIZ95IYqLHWRwFzgyavK87f8URw
 
 
 
 ### user2,3,4 canceled support/nag
-PUT http://localhost:8080/cancel/support
+PUT http://localhost:8080/cancel/nag?publicTodoPKId=1
 Content-Type: application/json
-
-{
-  "publicTodoPKId" : 1,
-  "supportNagSentUserPKId" : 2
-}
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0IiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwODY2MSwiZXhwIjoxNjczNDk1MDYxfQ.Uvigqn6PVT8vYpLeIfswaRrILjyH8vosc1sF6RPvGAoPNOiz9d7D7iPYsWGzIKjHL9XkMOQGT4qJhX39nMWLPA
 
 
 
 
 
-### user1 updates deadlineDate or finishes publicTodo 1 before deadlineDate
+### user1 updates deadlineDate or finishes publicTodo
 PUT localhost:8080/update/public/todo
 Content-Type: application/json
 Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwNDMzNCwiZXhwIjoxNjczNDkwNzM0fQ.DoWPwlxX6_UNG4TNT-JmEmz36RQVna_fOu_OlAowzq0a88xF8f7cmYMhQe_Js9UTjGCx8snQqksVHV6QwEv4vQ
 
 {
-  "publicTodoPKId": 7,
-  "authorUserPKId": 4,
-  "deadlineDate": "2023-01-08",
-  "finished": true
+  "publicTodoPKId": 2,
+  "finished": false,
+  "deadlineDate":"2023-01-11"
 }
 
 
 
 
 ### user1 deletes publicTodo 1 and 2
-DELETE localhost:8080/delete/public/todo
-Content-Type: application/json
-
-{
-  "publicTodoPKId": 2,
-  "authorUserPKId": 1
- }
+DELETE localhost:8080/delete/public/todo?publicTodoPKId=1
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwNDMzNCwiZXhwIjoxNjczNDkwNzM0fQ.DoWPwlxX6_UNG4TNT-JmEmz36RQVna_fOu_OlAowzq0a88xF8f7cmYMhQe_Js9UTjGCx8snQqksVHV6QwEv4vQ
 
 
 
 
-### user3 requested his/her timeline
-GET http://localhost:8080/time-line/3?pageNumber=1
+
+### user 3 checks timeline
+GET http://localhost:8080/time-line?pageNumber=0
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwNDQxOCwiZXhwIjoxNjczNDkwODE4fQ.ZFoHufUvD57vyT2dc-dC8ea6fqQ3VK6VA5uvhql4hwy0Ak-VstYS2mXZBnmuofMcJR0SMDDIe7JaXocPTOUimQ
+
+
+
+
+### user1,2,3,4 searchs other user
+GET http://localhost:8080/search/users?userNickname=two&pageNumber=0
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwNDQxOCwiZXhwIjoxNjczNDkwODE4fQ.ZFoHufUvD57vyT2dc-dC8ea6fqQ3VK6VA5uvhql4hwy0Ak-VstYS2mXZBnmuofMcJR0SMDDIe7JaXocPTOUimQ
 

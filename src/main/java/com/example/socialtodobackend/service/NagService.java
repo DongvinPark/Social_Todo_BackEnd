@@ -1,14 +1,12 @@
 package com.example.socialtodobackend.service;
 
-import com.example.socialtodobackend.dto.SupportNagDto;
-import com.example.socialtodobackend.dto.UserDto;
+import com.example.socialtodobackend.dto.user.UserDto;
 import com.example.socialtodobackend.entity.NagEntity;
 import com.example.socialtodobackend.entity.PublicTodoEntity;
-import com.example.socialtodobackend.exception.SocialTodoException;
+import com.example.socialtodobackend.exception.SingletonException;
 import com.example.socialtodobackend.repository.NagRepository;
 import com.example.socialtodobackend.repository.PublicTodoRepository;
 import com.example.socialtodobackend.repository.UserRepository;
-import com.example.socialtodobackend.type.ErrorCode;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,11 +28,9 @@ public class NagService {
      * 잔소리를 하나 추가한다.
      * */
     @Transactional
-    public boolean addNag(SupportNagDto supportNagDto) {
-        PublicTodoEntity publicTodoEntity = publicTodoRepository.findById(
-            supportNagDto.getPublicTodoPKId()).orElseThrow(
-            () -> new SocialTodoException(ErrorCode.PUBLIC_TODO_NOT_FOUND)
-        );
+    public void addNag(Long nagSentUserPKId, Long publicTodoPKId) {
+        PublicTodoEntity publicTodoEntity = publicTodoRepository.findById(publicTodoPKId)
+            .orElseThrow(() -> SingletonException.PUBLIC_TODO_NOT_FOUND);
 
         long nagNumber = publicTodoEntity.getNumberOfNag();
         nagNumber++;
@@ -44,12 +40,10 @@ public class NagService {
 
         nagRepository.save(
             NagEntity.builder()
-                .publishedTodoPKId(supportNagDto.getPublicTodoPKId())
-                .nagSentUserPKId(supportNagDto.getSupportNagSentUserPKId())
+                .publishedTodoPKId(publicTodoPKId)
+                .nagSentUserPKId(nagSentUserPKId)
                 .build()
         );
-
-        return true;
     }
 
 
@@ -60,20 +54,19 @@ public class NagService {
      * 취소 후 알림을 보내지는 않고, 취소시키기 이전의 잔소리로 인해서 전송된 알림에 대해서도 별도의 수정을 하지 않는다.
      * */
     @Transactional
-    public boolean undoNag(SupportNagDto supportNagDto) {
-        PublicTodoEntity publicTodoEntity = publicTodoRepository.findById(supportNagDto.getPublicTodoPKId()).orElseThrow(
-            () -> new SocialTodoException(ErrorCode.PUBLIC_TODO_NOT_FOUND)
+    public void undoNag(Long nagSentUserPKId, Long publicTodoPKId) {
+        PublicTodoEntity publicTodoEntity = publicTodoRepository.findById(publicTodoPKId).orElseThrow(
+            () -> SingletonException.PUBLIC_TODO_NOT_FOUND
         );
 
         long nagNumber = publicTodoEntity.getNumberOfNag();
-        if(nagNumber == 0) throw new SocialTodoException(ErrorCode.CANNOT_DECREASE_NAG_NUMBER_BELLOW_ZERO);
+        if(nagNumber == 0) throw SingletonException.CANNOT_DECREASE_NAG_NUMBER_BELLOW_ZERO;
         nagNumber--;
         publicTodoEntity.setNumberOfNag(nagNumber);
 
         nagRepository.deleteByPublishedTodoPKIdAndNagSentUserPKId(
-            supportNagDto.getPublicTodoPKId(), supportNagDto.getSupportNagSentUserPKId()
+            publicTodoPKId, nagSentUserPKId
         );
-        return true;
     }
 
 

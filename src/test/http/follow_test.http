@@ -1,70 +1,111 @@
+
 ### user1 sign up
-POST http://localhost:8080/temp/signup
+POST http://localhost:8080/sign-up
 Content-Type: application/json
 Accept: application/json
 
 {
-  "nickname": "one"
+  "nickname": "one",
+  "password": "1111",
+  "emailAddr": "e1@mail.com"
 }
 
 
 ### user2 sign up
-POST http://localhost:8080/temp/signup
+POST http://localhost:8080/sign-up
 Content-Type: application/json
 Accept: application/json
 
 {
-  "nickname": "two"
+  "nickname": "two",
+  "password": "1111",
+  "emailAddr": "e2@mail.com"
 }
 
 
 ### user3 sign up
-POST http://localhost:8080/temp/signup
+POST http://localhost:8080/sign-up
 Content-Type: application/json
 Accept: application/json
 
 {
-  "nickname": "three"
+  "nickname": "three",
+  "password": "1111",
+  "emailAddr": "e3@mail.com"
 }
 
 
 
 ### user4 sign up
-POST http://localhost:8080/temp/signup
+POST http://localhost:8080/sign-up
 Content-Type: application/json
 Accept: application/json
 
 {
-  "nickname": "four"
+  "nickname": "four",
+  "password": "1111",
+  "emailAddr": "e4@mail.com"
 }
+
+
+
+### user1,2,3,4 log in
+POST http://localhost:8080/sign-in
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "e4@mail.com",
+  "password": "1111"
+}
+
+
+
+### user1 update status message
+PUT http://localhost:8080/update/status-message?statusMessage=I'm one
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwODU5OCwiZXhwIjoxNjczNDk0OTk4fQ.b2JoZW69tjW_vT06KLO2R4xff6jgbnMTwpVhr3zjLRvqKSKeOBfOWY23QtdWSJQCr4q5N1Uo-H1F9HMHXWk1mw
+
+
+
+### user2 update status message
+PUT http://localhost:8080/update/status-message?statusMessage=I'm two
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwODYyMywiZXhwIjoxNjczNDk1MDIzfQ.99Z7xfteAYV_lYMgU8xRdsdFRCC9-JzTysLoh_r5KkVS1JvWuD7olI53r10tIZ95IYqLHWRwFzgyavK87f8URw
+
+
+
+### user3 update status message
+PUT http://localhost:8080/update/status-message?statusMessage=I'm three
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwODY0MSwiZXhwIjoxNjczNDk1MDQxfQ.TKQ0koh1vbSFfZ2qY_SvLc25p1FeSSwNBevLdiqNiHk4YKgSvs2Vml14qiNXMv7u3l9CaBDcRJIWlQBd6oAe4g
+
+
+
+### user4 update status message
+PUT http://localhost:8080/update/status-message?statusMessage=I'm four
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0IiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwODY2MSwiZXhwIjoxNjczNDk1MDYxfQ.Uvigqn6PVT8vYpLeIfswaRrILjyH8vosc1sF6RPvGAoPNOiz9d7D7iPYsWGzIKjHL9XkMOQGT4qJhX39nMWLPA
 
 
 
 ### user3 follows user1,2 / user1 follows user2
-POST http://localhost:8080/follow
+POST http://localhost:8080/follow?followRelationTargetUserPKId=2
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwNDQxOCwiZXhwIjoxNjczNDkwODE4fQ.ZFoHufUvD57vyT2dc-dC8ea6fqQ3VK6VA5uvhql4hwy0Ak-VstYS2mXZBnmuofMcJR0SMDDIe7JaXocPTOUimQ
 
-{
-    "followSentUserPKId": 3,
-    "followReceivedUserPKId": 2
-}
 
 
 
 ### check followees of user3
-GET http://localhost:8080/followees/3?pageNumber=1
-
+GET http://localhost:8080/followees?pageNumber=0
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwNDQxOCwiZXhwIjoxNjczNDkwODE4fQ.ZFoHufUvD57vyT2dc-dC8ea6fqQ3VK6VA5uvhql4hwy0Ak-VstYS2mXZBnmuofMcJR0SMDDIe7JaXocPTOUimQ
 
 
 ### check followers of user1,2
-GET http://localhost:8080/followers/2?pageNumber=0
+GET http://localhost:8080/followers?pageNumber=0
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwNDM5NiwiZXhwIjoxNjczNDkwNzk2fQ.JR3Y_zLo9AfKFAPImqXneGj5iXKxZLrqPfmfH1qccQXnufDhOz10-BInJa3ZGgokKH0kwXW6-A_bx0j0TLtyCQ
+
 
 
 
 ### user3 ufollows user1,2
-DELETE http://localhost:8080/delete/follow-relation?requestUserPKId=3&unfollowTargetUserPKId=1
+DELETE http://localhost:8080/delete/follow-relation?unfollowTargetUserPKId=1
 
 
-
-### user3 search users by nickname containing "one";
-GET http://localhost:8080/search/users/two?pageNumber=0

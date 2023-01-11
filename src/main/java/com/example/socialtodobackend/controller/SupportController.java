@@ -1,18 +1,16 @@
 package com.example.socialtodobackend.controller;
 
 import com.example.socialtodobackend.dto.APIDataResponse;
-import com.example.socialtodobackend.dto.SupportNagDto;
-import com.example.socialtodobackend.dto.UserDto;
+import com.example.socialtodobackend.dto.user.UserDto;
 import com.example.socialtodobackend.service.AlarmService;
 import com.example.socialtodobackend.service.SupportService;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,32 +24,38 @@ public class SupportController {
 
     @PutMapping("/create/support")
     public void pressSupport(
-        @RequestBody SupportNagDto supportNagDto
+        @AuthenticationPrincipal Long supportSentUserPKId,
+        @RequestParam Long publicTodoPKId,
+        @RequestParam Long todoAuthorUserPKId
     ){
-        supportService.addSupport(supportNagDto);
-        alarmService.sendSupportInfoAlarm(supportNagDto);
+        supportService.addSupport(supportSentUserPKId, publicTodoPKId);
+        alarmService.sendSupportInfoAlarm(supportSentUserPKId, publicTodoPKId, todoAuthorUserPKId);
     }
 
 
 
     @PutMapping("/cancel/support")
     public void cancelSupport(
-        @RequestBody SupportNagDto supportNagDto
+        @AuthenticationPrincipal Long supportSentUserPKId,
+        @RequestParam Long publicTodoPKId
     ){
-        supportService.undoSupport(supportNagDto);
+        supportService.undoSupport(supportSentUserPKId, publicTodoPKId);
     }
 
 
 
-    @GetMapping("/support/users/{publicTodoPKId}")
+    /**
+     * 회원가입을 마치고 정상적으로 로그인한 사용자라면 누구라도 확인할 수 있는 내용이므로,
+     * @AuthenticationPrincipal 을 사용하면 안 된다.
+     * */
+    @GetMapping("/support/users")
     public APIDataResponse< List<UserDto> > getSupportSentUsers(
-        @PathVariable Long publicTodoPKId, @RequestParam int pageNumber
+        @RequestParam Long publicTodoPKId, @RequestParam int pageNumber
     ){
         PageRequest pageRequest = PageRequest.of(pageNumber, CommonUtils.PAGE_SIZE);
         return APIDataResponse.of(
             supportService.getAllSupportSentUsers(publicTodoPKId, pageRequest)
         );
     }
-
 
 }

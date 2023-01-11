@@ -1,13 +1,10 @@
 package com.example.socialtodobackend.service;
 
-import com.example.socialtodobackend.dto.follow.FollowDto;
 import com.example.socialtodobackend.dto.follow.UserFollowInfoDto;
 import com.example.socialtodobackend.entity.FollowEntity;
-import com.example.socialtodobackend.entity.UserFollowSendCountEntity;
-import com.example.socialtodobackend.exception.SocialTodoException;
+import com.example.socialtodobackend.exception.SingletonException;
 import com.example.socialtodobackend.repository.FollowRepository;
 import com.example.socialtodobackend.repository.UserRepository;
-import com.example.socialtodobackend.type.ErrorCode;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,7 +21,6 @@ public class FollowService {
 
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
-    //private final FollowSendCountRepository followSendCountRepository;
 
 
     /**
@@ -38,18 +34,15 @@ public class FollowService {
         //서버의 메모리에 엄청난 부담을 줄 것이고, 아래에서 진행되는 유저 검색 쿼리도 비효율적으로 만들 것이기 때문이다.
         //여기서도 페이징을 하는 것이 가능한 이유는, followSentUserPKIdList 의 요소의 숫자와 userRepository.findAllByIdIn(followSentUserPKIdList, pageRequest)
         //의 검색 결과의 숫자가 항상 동일하며 1 대 1 매핑 관계를 이루고 있기 때문이다.
-        List<Long> followSentUserPKIdList = followRepository.findAllByFollowReceivedUserId(userPKId, pageRequest).getContent().stream().map(
-            FollowEntity::getFollowSentUserId).collect(Collectors.toList());
+        List<Long> followSentUserPKIdList = followRepository.findAllByFollowReceivedUserId(userPKId, pageRequest).getContent().stream().map(FollowEntity::getFollowSentUserId).collect(Collectors.toList());
 
-        //유저 리포지토리에서 위에서 만든 주키 아이디 리스트에 포함되는 사람들을 페이징 처리하여 보여준다. 한 페이지당 몇 명씩 보여줄지는 ComminUtils에 상수로 정의돼 있다.
+        //유저 리포지토리에서 위에서 만든 주키 아이디 리스트에 포함되는 사람들을 페이징 처리하여 보여준다. 한 페이지당 몇 명씩 보여줄지는 CommonUtils에 상수로 정의돼 있다.
         //주키 아이디 리스트에서 페이징 처리를 해주기 때문에 유저 리포지토리에서 리턴할 결과물의 개수는
         //위에서 넘겨 받은 followReceivedUserPKIdList의 요소의 개수와 항상 동일하다.
         //그리고 followReceivedUserPKIdList의 요소의 개수는 1개 페이지에서 포함 가능한
         //개수인 CommonUtils.PAGE_SIZE를 초과할 수 없다.
         //결론은 유저리포지토리에서 탐색할 때는 무조건 0번 페이자 1개만 반환하면 된다는 것이다.
-        //왜나면, 위에서 이미 페이징을 범위를 전부 처리했기 때문이다.
-        return userRepository.findAllByIdIn(followSentUserPKIdList, PageRequest.of(0, CommonUtils.PAGE_SIZE)).getContent().stream().map(
-            UserFollowInfoDto::fromEntity).collect(Collectors.toList());
+        return userRepository.findAllByIdIn(followSentUserPKIdList, PageRequest.of(0, CommonUtils.PAGE_SIZE)).getContent().stream().map(UserFollowInfoDto::fromEntity).collect(Collectors.toList());
     }
 
 
@@ -67,8 +60,7 @@ public class FollowService {
 
 
         //유저 리포지토리에서 위에서 만든 주키 아이디 리스트에 포함되는 사람들을 페이징 처리하여 보여준다.
-        return userRepository.findAllByIdIn(followReceivedUserPKIdList, PageRequest.of(0, CommonUtils.PAGE_SIZE)).getContent().stream().map(UserFollowInfoDto::fromEntity).collect(
-            Collectors.toList());
+        return userRepository.findAllByIdIn(followReceivedUserPKIdList, PageRequest.of(0, CommonUtils.PAGE_SIZE)).getContent().stream().map(UserFollowInfoDto::fromEntity).collect(Collectors.toList());
     }
 
 
@@ -78,34 +70,29 @@ public class FollowService {
      * 팔로우 할 수 있는 최대 사용자 숫자는 5000명이다.
      * */
     @Transactional
-    public boolean addFollowInfo(FollowDto followDto) {
-        validateFollowRelatedUsers(followDto);
+    public void addFollowInfo(Long followSentUserPKId, Long followRelationTargetUserPKId) {
+        validateFollowRelatedUsers(followSentUserPKId, followRelationTargetUserPKId);
 
-        if(followRepository.countAllByFollowSentUserId(followDto.getFollowSentUserPKId()).equals(CommonUtils.FOLLOW_LIMIT)){
-            throw new SocialTodoException(ErrorCode.CANNOT_FOLLOW_MORE_THAN_5000_USERS);
+        if(followRepository.countAllByFollowSentUserId(followSentUserPKId).equals(CommonUtils.FOLLOW_LIMIT)){
+            throw SingletonException.CANNOT_FOLLOW_MORE_THAN_5000_USERS;
         }
 
         followRepository.save(
             FollowEntity.builder()
-                .followSentUserId(followDto.getFollowSentUserPKId())
-                .followReceivedUserId(followDto.getFollowReceivedUserPKId())
+                .followSentUserId(followSentUserPKId)
+                .followReceivedUserId(followRelationTargetUserPKId)
                 .build()
         );
-        return true;
     }
 
 
 
     /**
      * 특정한 사용자가 다른 사용자를 언팔로우한 이벤트를 처리한다.
-     * <br/>
-     * 프런트 엔드에서 팔로우한 사람들 목록을 확인할 때, 백엔드에서 UserFollowInfoDto 내의 pkIdInFollowEntity 필드에 followEntity의 주키 번호를 함께 전달하기 때문에, 어떤 팔로우 정보를 삭제할지 탐색할 필요 없이, 해당 주키 아이디로 바로 삭제하면 된다.
-     * 이렇게 할 수 있는 이유는 한 유저와 다른 유저 간의 팔로우 관계가 유일하기 때문이다.
-     * 유저 두 명 간의 맞팔로우도 followRepository에서는 결국 서로 다른 튜플로 저장되기 때문에 문제 되지 않는다.
+     * 팔로우 정보 테이블에서 팔로우 정보가 있을 경우 삭제한다.
      * */
     @Transactional
     public void deleteFollowInfo(Long requestUserPKId, Long unfollowTargetUserPKId) {
-        //팔로우 정보 테이블에서 팔로우 정보가 있을 경우 삭제한다.
         followRepository.deleteByFollowSentUserIdEqualsAndFollowReceivedUserIdEquals(requestUserPKId, unfollowTargetUserPKId);
 
     }
@@ -116,29 +103,13 @@ public class FollowService {
 
 
 
-    /**
-     * followSendCountRepository 를 쓸 생각이 없다면 이 메서드도 사실상 필요가 없다.
-     * 추후 테스트 후 삭제 여부 결정한다.
-     * */
-    private void validateFollowLimit(UserFollowSendCountEntity userFollowSendCountEntity) {
-        if(userFollowSendCountEntity.getUserFollowSendCount() == 0L){
-            throw new SocialTodoException(ErrorCode.HAS_NO_USER_TO_UNFOLLOW);
-        }
-
-        if(userFollowSendCountEntity.getUserFollowSendCount() == CommonUtils.FOLLOW_LIMIT){
-            throw new SocialTodoException(ErrorCode.CANNOT_FOLLOW_MORE_THAN_5000_USERS);
-        }
-    }
-
-
-
-    private void validateFollowRelatedUsers(FollowDto followDto){
+    private void validateFollowRelatedUsers(Long followSentUserPKId, Long followRelationTargetUserPKId){
         if(
-            !userRepository.existsById(followDto.getFollowSentUserPKId())
-        ) throw new SocialTodoException(ErrorCode.USER_NOT_FOUND);
+            !userRepository.existsById(followSentUserPKId)
+        ) throw SingletonException.USER_NOT_FOUND;
         if(
-            !userRepository.existsById(followDto.getFollowReceivedUserPKId())
-        ) throw new SocialTodoException(ErrorCode.USER_NOT_FOUND);
+            !userRepository.existsById(followRelationTargetUserPKId)
+        ) throw SingletonException.USER_NOT_FOUND;
     }
 
 }

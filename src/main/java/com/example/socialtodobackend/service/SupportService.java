@@ -1,14 +1,12 @@
 package com.example.socialtodobackend.service;
 
-import com.example.socialtodobackend.dto.SupportNagDto;
-import com.example.socialtodobackend.dto.UserDto;
+import com.example.socialtodobackend.dto.user.UserDto;
 import com.example.socialtodobackend.entity.PublicTodoEntity;
 import com.example.socialtodobackend.entity.SupportEntity;
-import com.example.socialtodobackend.exception.SocialTodoException;
+import com.example.socialtodobackend.exception.SingletonException;
 import com.example.socialtodobackend.repository.PublicTodoRepository;
 import com.example.socialtodobackend.repository.SupportRepository;
 import com.example.socialtodobackend.repository.UserRepository;
-import com.example.socialtodobackend.type.ErrorCode;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,9 +29,9 @@ public class SupportService {
      * 응원을 하나 누른다.
      * */
     @Transactional
-    public boolean addSupport(SupportNagDto supportNagDto) {
-        PublicTodoEntity publicTodoEntity = publicTodoRepository.findById(supportNagDto.getPublicTodoPKId()).orElseThrow(
-            () -> new SocialTodoException(ErrorCode.PUBLIC_TODO_NOT_FOUND)
+    public void addSupport(Long supportSentUserPKId, Long publicTodoPKId) {
+        PublicTodoEntity publicTodoEntity = publicTodoRepository.findById(publicTodoPKId).orElseThrow(
+            () -> SingletonException.PUBLIC_TODO_NOT_FOUND
         );
 
         long supportNumber = publicTodoEntity.getNumberOfSupport();
@@ -44,12 +42,10 @@ public class SupportService {
 
         supportRepository.save(
             SupportEntity.builder()
-                .publishedTodoPKId(supportNagDto.getPublicTodoPKId())
-                .supportSentUserPKId(supportNagDto.getSupportNagSentUserPKId())
+                .publishedTodoPKId(publicTodoPKId)
+                .supportSentUserPKId(supportSentUserPKId)
                 .build()
         );
-
-        return true;
     }
 
 
@@ -60,22 +56,21 @@ public class SupportService {
      * 취소 후 따로 알림을 보내지는 않고, 취소시키기 이전의 응원으로 인해서 전송된 알림에 대해서도 별도의 수정을 하지 않는다.
      * */
     @Transactional
-    public boolean undoSupport(SupportNagDto supportNagDto) {
-        PublicTodoEntity publicTodoEntity = publicTodoRepository.findById(supportNagDto.getPublicTodoPKId()).orElseThrow(
-            () -> new SocialTodoException(ErrorCode.PUBLIC_TODO_NOT_FOUND)
+    public void undoSupport(Long supportSentUserPKId, Long publicTodoPKId) {
+        PublicTodoEntity publicTodoEntity = publicTodoRepository.findById(publicTodoPKId).orElseThrow(
+            () -> SingletonException.PUBLIC_TODO_NOT_FOUND
         );
 
         long supportNumber = publicTodoEntity.getNumberOfSupport();
-        if(supportNumber == 0) throw new SocialTodoException(ErrorCode.CANNOT_DECREASE_SUPPORT_NUMBER_BELLOW_ZERO);
+        if(supportNumber == 0) throw SingletonException.CANNOT_DECREASE_SUPPORT_NUMBER_BELLOW_ZERO;
         supportNumber--;
         publicTodoEntity.setNumberOfSupport(supportNumber);
 
         publicTodoRepository.save(publicTodoEntity);
 
         supportRepository.deleteByPublishedTodoPKIdAndSupportSentUserPKId(
-            supportNagDto.getPublicTodoPKId(), supportNagDto.getSupportNagSentUserPKId()
+            publicTodoPKId, supportSentUserPKId
         );
-        return true;
     }
 
 

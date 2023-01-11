@@ -2,7 +2,6 @@ package com.example.socialtodobackend.controller;
 
 import com.example.socialtodobackend.dto.APIDataResponse;
 import com.example.socialtodobackend.dto.privatetodo.PrivateTodoCreateRequest;
-import com.example.socialtodobackend.dto.privatetodo.PrivateTodoDeleteRequest;
 import com.example.socialtodobackend.dto.privatetodo.PrivateTodoDto;
 import com.example.socialtodobackend.dto.privatetodo.PrivateTodoUpdateRequest;
 import com.example.socialtodobackend.service.PrivateTodoService;
@@ -11,9 +10,9 @@ import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,19 +28,21 @@ public class PrivateTodoController {
 
     @PostMapping("/create/private/todo")
     public APIDataResponse< List<PrivateTodoDto> > addPrivateTodo(
+        @AuthenticationPrincipal Long authorUserPKId,
         @RequestBody @Valid PrivateTodoCreateRequest privateTodoCreateRequest
     ) {
-        privateTodoService.createPrivateTodoEntity(privateTodoCreateRequest);
+        privateTodoService.createPrivateTodoEntity(authorUserPKId, privateTodoCreateRequest);
+
         PageRequest pageRequest = PageRequest.of(0, CommonUtils.PAGE_SIZE);
         return APIDataResponse.of(
-            privateTodoService.getAllPrivateTodo(privateTodoCreateRequest.getAuthorUserId(), pageRequest)
+            privateTodoService.getAllPrivateTodo(authorUserPKId, pageRequest)
         );
     }
 
 
-    @GetMapping("/private/todos/{authorUserPKId}")
+    @GetMapping("/private/todos")
     public APIDataResponse<List<PrivateTodoDto>> getPrivateTodoList(
-        @PathVariable Long authorUserPKId,
+        @AuthenticationPrincipal Long authorUserPKId,
         @RequestParam int pageNumber
     ) {
         PageRequest pageRequest = PageRequest.of(pageNumber, CommonUtils.PAGE_SIZE);
@@ -53,17 +54,19 @@ public class PrivateTodoController {
 
     @PutMapping("/update/private/todo")
     public void updatePrivateTodo(
+        @AuthenticationPrincipal Long userPKId,
         @RequestBody @Valid PrivateTodoUpdateRequest privateTodoUpdateRequest
     ) {
-        privateTodoService.updatePrivateTodoEntity(privateTodoUpdateRequest);
+        privateTodoService.updatePrivateTodoEntity(userPKId, privateTodoUpdateRequest);
     }
 
 
     @DeleteMapping("/delete/private/todo")
     public void removePrivateTodo(
-        @RequestBody @Valid PrivateTodoDeleteRequest privateTodoDeleteRequest
+        @AuthenticationPrincipal Long userPKId,
+        @RequestParam Long privateTodoPKId
     ) {
-        privateTodoService.deletePrivateTodo(privateTodoDeleteRequest);
+        privateTodoService.deletePrivateTodo(userPKId, privateTodoPKId);
     }
 
 }

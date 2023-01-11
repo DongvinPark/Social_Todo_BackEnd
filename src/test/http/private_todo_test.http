@@ -2,11 +2,12 @@
 POST http://localhost:8080/create/private/todo
 Content-Type: application/json
 Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwNDQxOCwiZXhwIjoxNjczNDkwODE4fQ.ZFoHufUvD57vyT2dc-dC8ea6fqQ3VK6VA5uvhql4hwy0Ak-VstYS2mXZBnmuofMcJR0SMDDIe7JaXocPTOUimQ
+
 
 {
-    "authorUserId": 1,
-    "todoContent": "블루아카 하기",
-    "deadlineDate": "2023-01-21"
+    "todoContent": "3번 유저다!!",
+    "deadlineDate": "2023-01-23"
 }
 
 
@@ -15,28 +16,25 @@ Accept: application/json
 PUT http://localhost:8080/update/private/todo
 Content-Type: application/json
 Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwNDMzNCwiZXhwIjoxNjczNDkwNzM0fQ.DoWPwlxX6_UNG4TNT-JmEmz36RQVna_fOu_OlAowzq0a88xF8f7cmYMhQe_Js9UTjGCx8snQqksVHV6QwEv4vQ
 
 {
-  "id": 2,
-  "authorUserId": 1,
+  "id": 1,
   "todoContent": "블루아카 플레이하고 자기 ㅎㅎ",
-  "deadlineDate": "2023-01-23",
+  "deadlineDate": "2023-01-24",
   "finished": true
 }
 
 
 
 ### delete private todo
-DELETE http://localhost:8080/delete/private/todo
-Content-Type: application/json
+DELETE http://localhost:8080/delete/private/todo?privateTodoPKId=3
 Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwNDM5NiwiZXhwIjoxNjczNDkwNzk2fQ.JR3Y_zLo9AfKFAPImqXneGj5iXKxZLrqPfmfH1qccQXnufDhOz10-BInJa3ZGgokKH0kwXW6-A_bx0j0TLtyCQ
 
-{
-  "id": 1,
-  "authorUserPKId": 1
-}
 
 
 
 ### get All PrivateTodo items with paging
-GET http://localhost:8080/private/todos/1?pageNumber=0
+GET http://localhost:8080/private/todos?pageNumber=0
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwNDM5NiwiZXhwIjoxNjczNDkwNzk2fQ.JR3Y_zLo9AfKFAPImqXneGj5iXKxZLrqPfmfH1qccQXnufDhOz10-BInJa3ZGgokKH0kwXW6-A_bx0j0TLtyCQ

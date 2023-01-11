@@ -1,17 +1,21 @@
 ### user1,2,3 checks alarm
-GET http://localhost:8080/alarms/2
+GET http://localhost:8080/alarms?pageNumber=0
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0IiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwNDQ0MiwiZXhwIjoxNjczNDkwODQyfQ.OzI-t36MN9ggGd6_bJt3ap8vJCKguCNCSN0_Fx937RA0_nyayGrPJJhfl_snczC77q-aiti2waAu8YIMSPGWoQ
+
+
+
+
 
 
 ### user3 deletes one alarm
-DELETE http://localhost:8080/delete/alarm
+DELETE http://localhost:8080/delete/alarm?alarmPKId=2
 Content-Type: application/json
-
-{
-  "alarmEntityPKId" : 1,
-  "alarmReceiveUserPKId" : 3
-}
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwNDMzNCwiZXhwIjoxNjczNDkwNzM0fQ.DoWPwlxX6_UNG4TNT-JmEmz36RQVna_fOu_OlAowzq0a88xF8f7cmYMhQe_Js9UTjGCx8snQqksVHV6QwEv4vQ
 
 
 
-### user1 deletes all alarm
-DELETE http://localhost:8080/delete/entire-alarms/1
+
+
+### user1,2,3,4 deletes all alarm
+DELETE http://localhost:8080/delete/entire-alarms
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwNDMzNCwiZXhwIjoxNjczNDkwNzM0fQ.DoWPwlxX6_UNG4TNT-JmEmz36RQVna_fOu_OlAowzq0a88xF8f7cmYMhQe_Js9UTjGCx8snQqksVHV6QwEv4vQ

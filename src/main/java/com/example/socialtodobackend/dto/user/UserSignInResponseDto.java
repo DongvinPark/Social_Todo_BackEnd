@@ -1,4 +1,4 @@
-package com.example.socialtodobackend.dto;
+package com.example.socialtodobackend.dto.user;
 
 import com.example.socialtodobackend.entity.UserEntity;
 import java.time.LocalDateTime;
@@ -13,7 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserDto {
+public class UserSignInResponseDto {
 
     private Long id;
 
@@ -25,19 +25,20 @@ public class UserDto {
 
     private LocalDateTime registeredAt;
 
-
+    private String jwt;
 
     /**
-     * 회원 가입시 프런트 엔드로부터 들어오는 UserDto에서는 이메일 주소가 포함될 수 있지만, 백엔드에서 유저 정보를 프런트엔드로 넘길 때는 이메일 주소를 넘기지 말아야 한다.
-     * <br><br/>
-     * 이메일 주소는 로그인 시 사용되는 아이디이기 때문에 누구에게나 공개되어도 괜찮은 정보는 아니다.
+     * 로그인에 성공했을 때만 해당 유저의 프런트엔드로 리턴되는 Dto 이므로,
+     * 이메일 주소와 토큰 정보를 함께 넘겨준다.
      * */
-    public static UserDto fromEntity(UserEntity userEntity){
-        return UserDto.builder()
+    public static UserSignInResponseDto fromEntity(UserEntity userEntity, String token){
+        return UserSignInResponseDto.builder()
             .id(userEntity.getId())
             .nickname(userEntity.getNickname())
+            .emailAddr(userEntity.getEmailAddr())
             .statusMessage(userEntity.getStatusMessage())
             .registeredAt(userEntity.getRegisteredAt())
+            .jwt(token)
             .build();
     }
 

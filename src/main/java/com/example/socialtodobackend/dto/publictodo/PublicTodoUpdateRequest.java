@@ -11,11 +11,9 @@ public class PublicTodoUpdateRequest {
     private Long publicTodoPKId;
 
     @NotNull
-    private Long authorUserPKId;
-
-    @NotNull
     private boolean finished;
 
+    @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate deadlineDate;
 }

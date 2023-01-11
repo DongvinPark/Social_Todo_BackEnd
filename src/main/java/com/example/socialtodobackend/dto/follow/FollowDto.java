@@ -13,10 +13,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 public class FollowDto {
-    @NotNull
-    private Long followSentUserPKId;
 
     @NotNull
-    private Long followReceivedUserPKId;
+    private Long followRelationTargetUserPKId;
 
 }

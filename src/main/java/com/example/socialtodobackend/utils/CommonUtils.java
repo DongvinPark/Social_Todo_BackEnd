@@ -1,11 +1,12 @@
 package com.example.socialtodobackend.utils;
 
+import com.example.socialtodobackend.exception.SingletonException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * 서비스 운영에 필요한 각종 상수 및 유틸리티 메서드들이 모여 있다.
+ * 서비스 운영에 필요한 각종 상수, 유틸리티 메서드들이 모여 있다.
  * 팔로우 수 제한, 날짜와 스트링 간 변환, 알림용 메시지 작성 등의 메서들이다.
  * */
 public class CommonUtils {
@@ -16,7 +17,34 @@ public class CommonUtils {
      * */
     public static final long FOLLOW_LIMIT = 5_000;
 
-    public static final int PAGE_SIZE = 1;
+    public static final int PAGE_SIZE = 20;
+    public static final int TODO_CONTENT_LENGTH_LIMIT = 100;
+    public static final int  STATUS_MESSAGE_LENGTH_LIMIT = 50;
+    public static final int LONGEST_DEADLINE_DATE_LIMIT = 365;
+
+
+    /**
+     * 투두 컨텐츠의 길이는 0자 이상 100자 이내여야 한다.
+     * 오늘 만들어진 투두 아이템의 데드라인 날짜는 가장 빠르게 설정할 경우 오늘로 설정할 수 있고,
+     * 가장 늦게 설정할 경우, 오늘로부터 365일이 지난 날짜까지 설정할 수 있다.
+     * 그 이외의 디데이 설정은 전부 무효처리 한다.
+     * */
+    public static void validateContentLengthAndDeadlineDate(String privateTodoContent, LocalDate dateInput){
+        if(privateTodoContent != null){
+            if(privateTodoContent.length() == 0){
+                throw SingletonException.ZERO_CONTENT_LENGTH;
+            }
+            if(privateTodoContent.length() > TODO_CONTENT_LENGTH_LIMIT){
+                throw SingletonException.CONTENT_LENGTH_TOO_LONG;
+            }
+        }
+        if(dateInput.isBefore(LocalDate.now() ) ){
+            throw SingletonException.CANNOT_SET_PRIVATE_TODO_DEADLINE_ON_PAST;
+        }
+        if(dateInput.isAfter( LocalDate.now().plusDays(LONGEST_DEADLINE_DATE_LIMIT) )){
+            throw SingletonException.CANNOT_SET_TODO_DEADLINE_AFTER_365DAYS;
+        }
+    }
 
 
     /**

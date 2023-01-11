@@ -7,7 +7,4 @@ import lombok.Getter;
 public class AlarmDeleteRequest {
     @NotNull
     private Long alarmEntityPKId;
-
-    @NotNull
-    private Long alarmReceiveUserPKId;
 }

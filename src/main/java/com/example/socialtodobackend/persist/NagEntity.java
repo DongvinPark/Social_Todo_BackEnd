@@ -1,4 +1,4 @@
-package com.example.socialtodobackend.entity;
+package com.example.socialtodobackend.persist;
 
 import java.time.LocalDateTime;
 import javax.persistence.Entity;
@@ -21,27 +21,23 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Builder
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class UserEntity {
+public class NagEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nickname;
+    private Long publishedTodoPKId;
 
-    private String password;
-
-    private String emailAddr;
-
-    private String statusMessage;
+    private Long nagSentUserPKId;
 
     @CreatedDate
-    private LocalDateTime registeredAt;
-
-    //회원 탈퇴 시, 테이블에서 해당 회원의 엔티티가 삭제되므로, 삭제 날짜를 기록하기 위한
-    //별도의 필드는 작성하지 않음.
+    private LocalDateTime createdAt;
 
 }
+
+
+
 
 
 

@@ -1,6 +1,5 @@
-package com.example.socialtodobackend.repository;
+package com.example.socialtodobackend.persist;
 
-import com.example.socialtodobackend.entity.PublicTodoEntity;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Optional;

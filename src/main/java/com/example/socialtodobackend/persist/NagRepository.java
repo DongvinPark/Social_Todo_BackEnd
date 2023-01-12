@@ -1,6 +1,5 @@
-package com.example.socialtodobackend.repository;
+package com.example.socialtodobackend.persist;
 
-import com.example.socialtodobackend.entity.NagEntity;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;

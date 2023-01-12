@@ -1,6 +1,5 @@
-package com.example.socialtodobackend.repository;
+package com.example.socialtodobackend.persist;
 
-import com.example.socialtodobackend.entity.FollowEntity;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -35,7 +34,7 @@ public interface FollowRepository extends JpaRepository<FollowEntity, Long> {
     Long countAllByFollowSentUserId(Long userPKId);
 
     /**
-     *
+     * 팔로우 관계를 삭제할 때 사용한다.
      * */
     void deleteByFollowSentUserIdEqualsAndFollowReceivedUserIdEquals(Long followSentUserId,
         Long followReceivedUserId);

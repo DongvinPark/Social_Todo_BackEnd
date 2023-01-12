@@ -85,10 +85,10 @@ Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0IiwiaXNzIjoiU29jaWFsX1RvZ
 
 
 
-### user3 follows user1,2 / user1 follows user2
-POST http://localhost:8080/follow?followRelationTargetUserPKId=2
+### user1 follows user2,3,4 / user1 follows user2
+POST http://localhost:8080/follow?followRelationTargetUserPKId=4
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwNDQxOCwiZXhwIjoxNjczNDkwODE4fQ.ZFoHufUvD57vyT2dc-dC8ea6fqQ3VK6VA5uvhql4hwy0Ak-VstYS2mXZBnmuofMcJR0SMDDIe7JaXocPTOUimQ
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQ4NTM2NCwiZXhwIjoxNjczNTcxNzY0fQ.E_G7DpyqBWBYPQ4ADA-iJfECPm-9OQGLA_v6SVyURJr3bxADXKute54Jmjq1tci0aQqmWnNTVtCT2-SHbC00Dg
 
 
 

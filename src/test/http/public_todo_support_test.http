@@ -2,11 +2,11 @@
 POST http://localhost:8080/create/public/todo
 Content-Type: application/json
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwODU5OCwiZXhwIjoxNjczNDk0OTk4fQ.b2JoZW69tjW_vT06KLO2R4xff6jgbnMTwpVhr3zjLRvqKSKeOBfOWY23QtdWSJQCr4q5N1Uo-H1F9HMHXWk1mw
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0IiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQ4NTQxOCwiZXhwIjoxNjczNTcxODE4fQ.ZgGDfLN-_8KED7yI1BzwmdCQpP435J-7gVLP7lgG9yGYHBVLKdr4m-RCoGUckD6sKEmvh3IO3xH6KaINZTQkbg
 
 {
-  "authorUserNickname" : "one",
-  "publicTodoContent" : "develop Social Todo App BackEnd",
+  "authorUserNickname" : "four",
+  "publicTodoContent" : "todo4",
   "deadlineDate" : "2023-01-31"
 }
 
@@ -62,12 +62,12 @@ Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0IiwiaXNzIjoiU29jaWFsX1RvZ
 PUT localhost:8080/update/public/todo
 Content-Type: application/json
 Accept: application/json
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwNDMzNCwiZXhwIjoxNjczNDkwNzM0fQ.DoWPwlxX6_UNG4TNT-JmEmz36RQVna_fOu_OlAowzq0a88xF8f7cmYMhQe_Js9UTjGCx8snQqksVHV6QwEv4vQ
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0IiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQ4NTQxOCwiZXhwIjoxNjczNTcxODE4fQ.ZgGDfLN-_8KED7yI1BzwmdCQpP435J-7gVLP7lgG9yGYHBVLKdr4m-RCoGUckD6sKEmvh3IO3xH6KaINZTQkbg
 
 {
-  "publicTodoPKId": 2,
+  "publicTodoPKId": 4,
   "finished": false,
-  "deadlineDate":"2023-01-11"
+  "deadlineDate":"2023-01-12"
 }
 
 
@@ -81,9 +81,9 @@ Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaXNzIjoiU29jaWFsX1RvZ
 
 
 
-### user 3 checks timeline
+### user 1 checks timeline
 GET http://localhost:8080/time-line?pageNumber=0
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQwNDQxOCwiZXhwIjoxNjczNDkwODE4fQ.ZFoHufUvD57vyT2dc-dC8ea6fqQ3VK6VA5uvhql4hwy0Ak-VstYS2mXZBnmuofMcJR0SMDDIe7JaXocPTOUimQ
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaXNzIjoiU29jaWFsX1RvZG9fQmFja0VuZCIsImlhdCI6MTY3MzQ4NTM2NCwiZXhwIjoxNjczNTcxNzY0fQ.E_G7DpyqBWBYPQ4ADA-iJfECPm-9OQGLA_v6SVyURJr3bxADXKute54Jmjq1tci0aQqmWnNTVtCT2-SHbC00Dg
 
 
 

@@ -1,10 +1,10 @@
 package com.example.socialtodobackend.service;
 
 import com.example.socialtodobackend.dto.follow.UserFollowInfoDto;
-import com.example.socialtodobackend.entity.FollowEntity;
+import com.example.socialtodobackend.persist.FollowEntity;
 import com.example.socialtodobackend.exception.SingletonException;
-import com.example.socialtodobackend.repository.FollowRepository;
-import com.example.socialtodobackend.repository.UserRepository;
+import com.example.socialtodobackend.persist.FollowRepository;
+import com.example.socialtodobackend.persist.UserRepository;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.util.List;
 import java.util.stream.Collectors;

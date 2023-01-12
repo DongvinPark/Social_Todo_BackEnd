@@ -1,4 +1,4 @@
-package com.example.socialtodobackend.entity;
+package com.example.socialtodobackend.persist;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,7 +23,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Builder
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class PublicTodoEntity {
+public class PrivateTodoEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,17 +31,11 @@ public class PublicTodoEntity {
 
     private Long authorUserId;
 
-    private String authorNickname;
-
     private String todoContent;
 
     private LocalDate deadlineDate;
 
-    private boolean finished;
-
-    private Long numberOfSupport;
-
-    private Long numberOfNag;
+    private boolean isFinished;
 
     @CreatedDate
     private LocalDateTime createdAt;
@@ -50,7 +44,6 @@ public class PublicTodoEntity {
     private LocalDateTime modifiedAt;
 
 }
-
 
 
 

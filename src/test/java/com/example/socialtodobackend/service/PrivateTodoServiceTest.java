@@ -12,9 +12,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.example.socialtodobackend.dto.privatetodo.PrivateTodoDto;
-import com.example.socialtodobackend.entity.PrivateTodoEntity;
+import com.example.socialtodobackend.persist.PrivateTodoEntity;
 import com.example.socialtodobackend.exception.SocialTodoException;
-import com.example.socialtodobackend.repository.PrivateTodoRepository;
+import com.example.socialtodobackend.persist.PrivateTodoRepository;
 import com.example.socialtodobackend.type.ErrorCode;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.time.LocalDateTime;

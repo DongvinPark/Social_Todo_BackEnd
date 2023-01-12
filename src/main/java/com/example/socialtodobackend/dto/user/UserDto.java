@@ -1,6 +1,6 @@
 package com.example.socialtodobackend.dto.user;
 
-import com.example.socialtodobackend.entity.UserEntity;
+import com.example.socialtodobackend.persist.UserEntity;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,12 +1,12 @@
 package com.example.socialtodobackend.service;
 
 import com.example.socialtodobackend.dto.alarm.AlarmDto;
-import com.example.socialtodobackend.entity.AlarmEntity;
-import com.example.socialtodobackend.entity.UserEntity;
+import com.example.socialtodobackend.persist.AlarmEntity;
+import com.example.socialtodobackend.persist.UserEntity;
 import com.example.socialtodobackend.exception.SingletonException;
-import com.example.socialtodobackend.repository.AlarmRepository;
-import com.example.socialtodobackend.repository.PublicTodoRepository;
-import com.example.socialtodobackend.repository.UserRepository;
+import com.example.socialtodobackend.persist.AlarmRepository;
+import com.example.socialtodobackend.persist.PublicTodoRepository;
+import com.example.socialtodobackend.persist.UserRepository;
 import com.example.socialtodobackend.type.AlarmTypeCode;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.util.List;

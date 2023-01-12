@@ -1,12 +1,12 @@
 package com.example.socialtodobackend.service;
 
 import com.example.socialtodobackend.dto.user.UserDto;
-import com.example.socialtodobackend.entity.PublicTodoEntity;
-import com.example.socialtodobackend.entity.SupportEntity;
+import com.example.socialtodobackend.persist.PublicTodoEntity;
+import com.example.socialtodobackend.persist.SupportEntity;
 import com.example.socialtodobackend.exception.SingletonException;
-import com.example.socialtodobackend.repository.PublicTodoRepository;
-import com.example.socialtodobackend.repository.SupportRepository;
-import com.example.socialtodobackend.repository.UserRepository;
+import com.example.socialtodobackend.persist.PublicTodoRepository;
+import com.example.socialtodobackend.persist.SupportRepository;
+import com.example.socialtodobackend.persist.UserRepository;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.util.List;
 import java.util.stream.Collectors;

@@ -9,7 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.socialtodobackend.dto.privatetodo.PrivateTodoDto;
-import com.example.socialtodobackend.entity.PrivateTodoEntity;
+import com.example.socialtodobackend.persist.PrivateTodoEntity;
 import com.example.socialtodobackend.service.PrivateTodoService;
 import com.example.socialtodobackend.utils.CommonUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;

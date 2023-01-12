@@ -1,6 +1,6 @@
 package com.example.socialtodobackend.security;
 
-import com.example.socialtodobackend.entity.UserEntity;
+import com.example.socialtodobackend.persist.UserEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

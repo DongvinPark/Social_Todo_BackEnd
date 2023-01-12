@@ -1,6 +1,5 @@
-package com.example.socialtodobackend.entity;
+package com.example.socialtodobackend.persist;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
@@ -13,7 +12,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
@@ -23,27 +21,28 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Builder
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class PrivateTodoEntity {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long authorUserId;
+    private String nickname;
 
-    private String todoContent;
+    private String password;
 
-    private LocalDate deadlineDate;
+    private String emailAddr;
 
-    private boolean isFinished;
+    private String statusMessage;
 
     @CreatedDate
-    private LocalDateTime createdAt;
+    private LocalDateTime registeredAt;
 
-    @LastModifiedDate
-    private LocalDateTime modifiedAt;
+    //회원 탈퇴 시, 테이블에서 해당 회원의 엔티티가 삭제되므로, 삭제 날짜를 기록하기 위한
+    //별도의 필드는 작성하지 않음.
 
 }
+
 
 
 

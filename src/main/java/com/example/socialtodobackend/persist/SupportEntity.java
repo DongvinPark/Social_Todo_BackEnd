@@ -1,4 +1,4 @@
-package com.example.socialtodobackend.entity;
+package com.example.socialtodobackend.persist;
 
 import java.time.LocalDateTime;
 import javax.persistence.Entity;
@@ -21,7 +21,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Builder
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class NagEntity {
+public class SupportEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,35 +29,9 @@ public class NagEntity {
 
     private Long publishedTodoPKId;
 
-    private Long nagSentUserPKId;
+    private Long supportSentUserPKId;
 
     @CreatedDate
     private LocalDateTime createdAt;
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

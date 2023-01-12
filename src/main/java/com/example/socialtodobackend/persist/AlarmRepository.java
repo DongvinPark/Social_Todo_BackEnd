@@ -1,6 +1,5 @@
-package com.example.socialtodobackend.repository;
+package com.example.socialtodobackend.persist;
 
-import com.example.socialtodobackend.entity.AlarmEntity;
 import com.example.socialtodobackend.type.AlarmTypeCode;
 import java.util.Optional;
 import org.springframework.data.domain.PageRequest;

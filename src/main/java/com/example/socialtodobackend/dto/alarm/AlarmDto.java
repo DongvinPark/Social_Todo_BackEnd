@@ -1,6 +1,6 @@
 package com.example.socialtodobackend.dto.alarm;
 
-import com.example.socialtodobackend.entity.AlarmEntity;
+import com.example.socialtodobackend.persist.AlarmEntity;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

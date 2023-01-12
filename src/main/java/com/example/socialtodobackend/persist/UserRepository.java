@@ -1,6 +1,5 @@
-package com.example.socialtodobackend.repository;
+package com.example.socialtodobackend.persist;
 
-import com.example.socialtodobackend.entity.UserEntity;
 import java.util.Collection;
 import java.util.Optional;
 import org.springframework.data.domain.PageRequest;

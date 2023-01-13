@@ -1,11 +1,10 @@
 package com.example.socialtodobackend.service;
 
 import com.example.socialtodobackend.dto.alarm.AlarmDto;
-import com.example.socialtodobackend.persist.AlarmEntity;
-import com.example.socialtodobackend.persist.UserEntity;
 import com.example.socialtodobackend.exception.SingletonException;
+import com.example.socialtodobackend.persist.AlarmEntity;
 import com.example.socialtodobackend.persist.AlarmRepository;
-import com.example.socialtodobackend.persist.PublicTodoRepository;
+import com.example.socialtodobackend.persist.UserEntity;
 import com.example.socialtodobackend.persist.UserRepository;
 import com.example.socialtodobackend.type.AlarmTypeCode;
 import com.example.socialtodobackend.utils.CommonUtils;
@@ -23,7 +22,6 @@ public class AlarmService {
 
     private final AlarmRepository alarmRepository;
     private final UserRepository userRepository;
-    private final PublicTodoRepository publicTodoRepository;
 
 
 
@@ -33,10 +31,6 @@ public class AlarmService {
      * */
     @Transactional(readOnly = true)
     public List<AlarmDto> getAlarmList(Long userPKId, PageRequest pageRequest) {
-        if(!userRepository.findById(userPKId).isPresent()){
-            throw SingletonException.USER_NOT_FOUND;
-        }
-
         return alarmRepository.findAllByAlarmReceiverUserIdEquals(userPKId, pageRequest).getContent().stream().map(
             AlarmDto::fromEntity).collect(
             Collectors.toList());
@@ -59,10 +53,6 @@ public class AlarmService {
      * */
     @Transactional
     public void removeAllAlarm(Long userPKId) {
-        if(!userRepository.findById(userPKId).isPresent()){
-            throw SingletonException.USER_NOT_FOUND;
-        }
-
         alarmRepository.deleteAllByAlarmReceiverUserIdEquals(userPKId);
     }
 
@@ -87,7 +77,7 @@ public class AlarmService {
                 .build()
         );
 
-        //그 다음 상대방에게 내가 팔로우 했다는 내용을 구성하여 알림을 보낸다. 닉네임 쓰라.
+        //그 다음 상대방에게 내가 팔로우 했다는 내용을 구성하여 알림을 보낸다. 닉네임 쓴다.
         alarmRepository.save(
             AlarmEntity.builder()
                 .alarmReceiverUserId(followRelationTargetUserPKId)
@@ -151,12 +141,12 @@ public class AlarmService {
         //기존 알림이 있는지를 먼저 찾는다. 공개투두 아이템은 기존 알람이 없는 최초의 응원일 때만 찾아내면 된다.
         //기존 알림이 있는지 찾아낼 때는 알림 엔티티의 relatedPublicTodoPKId와 alarmType이 있으면 된다.
         //각각의 모든 공개 투두 아이템에 대하여 발생 가능한 잔소리 알림은 0개 또는 단 1 개만 가능하기 때문이다.
-        Optional<AlarmEntity> optionalAlarmEntity = alarmRepository.findAlarmEntityByRelatedPublicTodoPKIdEqualsAndAlarmTypeEquals(
+        Optional<com.example.socialtodobackend.persist.AlarmEntity> optionalAlarmEntity = alarmRepository.findAlarmEntityByRelatedPublicTodoPKIdEqualsAndAlarmTypeEquals(
             publicTodoPKId, AlarmTypeCode.NAG
         );
         if(optionalAlarmEntity.isPresent()){
             //기존 알림이 존재한다. 잔소리 해준 사람 숫자만 += 1 해주면 된다.
-            AlarmEntity alarmEntity = optionalAlarmEntity.get();
+            com.example.socialtodobackend.persist.AlarmEntity alarmEntity = optionalAlarmEntity.get();
             long nagSentUserNumber = alarmEntity.getNumberOfPeopleRelatedToAlarm();
             nagSentUserNumber++;
             alarmEntity.setNumberOfPeopleRelatedToAlarm(nagSentUserNumber);
@@ -166,7 +156,7 @@ public class AlarmService {
             //프런트엔드에서 넘겨 받은 todoAuthorUserPKId를 이용해서 추가적인 DB I/O 없이 바로 새 알림을 저장한다.
 
             alarmRepository.save(
-                AlarmEntity.builder()
+                com.example.socialtodobackend.persist.AlarmEntity.builder()
                     .alarmReceiverUserId(todoAuthorUserPKId)
                     .alarmSenderUserId(nagSentUserPKId)
                     .numberOfPeopleRelatedToAlarm(1L)

@@ -32,9 +32,6 @@ public class PublicTodoService {
      * */
     @Transactional(readOnly = true)
     public List<PublicTodoDto> getAllPublicTodo(Long authorUserPKId, PageRequest pageRequest) {
-        if(!userRepository.existsById(authorUserPKId)){
-            throw SingletonException.USER_NOT_FOUND;
-        }
 
         return publicTodoRepository.findAllByAuthorUserId(authorUserPKId, pageRequest).getContent().stream().map(PublicTodoDto::fromEntity).collect(Collectors.toList());
     }
@@ -47,9 +44,6 @@ public class PublicTodoService {
      * */
     @Transactional
     public void addPublicTodo(Long authorUserPKId, PublicTodoCreateRequest publicTodoCreateRequest) {
-        if(!userRepository.existsById(authorUserPKId)){
-            throw SingletonException.USER_NOT_FOUND;
-        }
         CommonUtils.validateContentLengthAndDeadlineDate(publicTodoCreateRequest.getPublicTodoContent(), publicTodoCreateRequest.getDeadlineDate());
 
         publicTodoRepository.save(

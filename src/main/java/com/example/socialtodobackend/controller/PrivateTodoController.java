@@ -61,7 +61,7 @@ public class PrivateTodoController {
     }
 
 
-    @DeleteMapping("/delete/private/todo")
+    @DeleteMapping("/private/todo")
     public void removePrivateTodo(
         @AuthenticationPrincipal Long userPKId,
         @RequestParam Long privateTodoPKId

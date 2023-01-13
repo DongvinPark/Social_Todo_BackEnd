@@ -180,6 +180,8 @@ public class UserService {
 
     /**
      * 입력된 이메일 및 비번을 바탕으로 로그인 성공 여부를 판별하는 것에 사용되는 메서드다.
+     * 한 명의 유저의 입장에서는 Jwt를 발급 받는 순간(==로그인 하는 순간)에 딱 1번만 실행된다.
+     * 그 유저의 jwt가 유효할 때는 다시 jwt가 만료되지 않는 이상 다시 실행되지 않는다.
      * */
     private UserEntity getByCredentials(
         String userEmail, String password, PasswordEncoder passwordEncoder

@@ -1,5 +1,7 @@
 package com.example.socialtodobackend.security;
 
+import com.example.socialtodobackend.exception.SingletonException;
+import com.example.socialtodobackend.persist.UserRepository;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -23,13 +25,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
     private final JWTProvider jwtProvider;
+    private final UserRepository userRepository;
 
 
     /**
      * 스프링 시큐리티 필터 체인에서 실시할 필터링 내용을 정의해준다.
-     * <br><br/>
-     * 존재하지 않는 사용자가 접근을 시도할 경우, 굳이 서비스 계층까지 내려갈 것 없이
-     * 여기서 바로 걸러내면 된다.
      * */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChan) throws ServletException, IOException {
@@ -43,21 +43,27 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
                 //log.info("인증 완료 된 사용자의 주키 아이디 값 : " + userId);
 
-                //이 부분을 통해서 컨트롤러 계층 메서드들의 파라미터들 중에서 @AuthenticationPrincipal 이 붙어 있는
-                //매개변수들에게 값을 넘겨줄 수 있다.
-                AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userId,
-                    null,
-                    AuthorityUtils.NO_AUTHORITIES
-                );
+                //JWT에서 얻은 유저의 주키 아이디가 실존하는지를 판단한다.
+                //나중에 레디스로 캐시할 때는 DB 보다 레디스 클러스터를 먼저 보도록 코드를 수정한다.
+                if(userRepository.existsById(userId)){
+                    //이 부분을 통해서 컨트롤러 계층 메서드들의 파라미터들 중에서 @AuthenticationPrincipal 이 붙어 있는
+                    //매개변수들에게 값을 넘겨줄 수 있다.
+                    AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userId,
+                        null,
+                        AuthorityUtils.NO_AUTHORITIES
+                    );
 
-                authentication.setDetails( new WebAuthenticationDetailsSource().buildDetails(request) );
+                    authentication.setDetails( new WebAuthenticationDetailsSource().buildDetails(request) );
 
-                SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+                    SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 
-                securityContext.setAuthentication(authentication);
+                    securityContext.setAuthentication(authentication);
 
-                SecurityContextHolder.setContext(securityContext);
+                    SecurityContextHolder.setContext(securityContext);
+                } else {
+                    throw SingletonException.USER_NOT_FOUND;
+                }
             }//if
         }//try
         catch(Exception e) {

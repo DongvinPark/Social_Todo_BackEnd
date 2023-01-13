@@ -42,7 +42,7 @@ public class AlarmController {
     /**
      * 알림 하나를 삭제하는 동작을 마친 후, 굳이 전체 알림 리스트를 다시 불러오는 동작을 할 필요는 없다.
      * */
-    @DeleteMapping("/delete/alarm")
+    @DeleteMapping("/alarm")
     public void deleteOneAlarm(
         @AuthenticationPrincipal Long userPKId,
         @RequestParam Long alarmPKId
@@ -54,7 +54,7 @@ public class AlarmController {
     /**
      * 전체 알림을 삭제하는 동작을 마친 후, 굳이 다시 알림 리스트를 불러오는 동작을 할 필요는 없다.
      * */
-    @DeleteMapping("/delete/entire-alarms")
+    @DeleteMapping("/entire-alarms")
     public void deleteAllAlarms(
         @AuthenticationPrincipal Long userPKId
     ){

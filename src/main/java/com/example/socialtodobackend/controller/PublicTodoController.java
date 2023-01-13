@@ -70,7 +70,7 @@ public class PublicTodoController {
 
 
 
-    @DeleteMapping("/delete/public/todo")
+    @DeleteMapping("/public/todo")
     public void deletePublicTodo(
         @AuthenticationPrincipal Long authorUserPKId,
         @RequestParam Long publicTodoPKId

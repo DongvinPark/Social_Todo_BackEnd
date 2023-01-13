@@ -4,7 +4,7 @@ import com.example.socialtodobackend.type.ErrorCode;
 
 public class SingletonException {
 
-    public static final SocialTodoException USER_NOT_FOUND = SingletonException.USER_NOT_FOUND;;
+    public static final SocialTodoException USER_NOT_FOUND = new SocialTodoException(ErrorCode.USER_NOT_FOUND);
     public static final SocialTodoException INTERNAL_SERVER_ERROR = new SocialTodoException(ErrorCode.INTERNAL_SERVER_ERROR);
     public static final SocialTodoException ZERO_CONTENT_LENGTH = new SocialTodoException(ErrorCode.ZERO_CONTENT_LENGTH);
     public static final SocialTodoException CANNOT_SET_PRIVATE_TODO_DEADLINE_ON_PAST = new SocialTodoException(ErrorCode.CANNOT_SET_PRIVATE_TODO_DEADLINE_ON_PAST);

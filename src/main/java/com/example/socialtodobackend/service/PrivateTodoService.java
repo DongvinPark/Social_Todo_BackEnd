@@ -57,9 +57,8 @@ public class PrivateTodoService {
 
 
     /**
-     * 프라이빗 투두 아이템 1개를 수정한 후, 수정된 결과 리스트를 반환한다.
-     * 프라이빗 투두 아이템에서 유저가 수정할 수 있는 것은 해당 투두 아이템의 내용뿐이다.
-     * 또한 자기 자신의 프라이빗 투두만을 수정할 수 있다.
+     * 프라이빗 투두 아이템 1개를 수정한다.
+     * 수정 후 굳이 프라이빗 투두 아이템 전체를 다시 반환해줄 필요는 없다.
      * */
     @Transactional
     public void updatePrivateTodoEntity(Long userPKId, PrivateTodoUpdateRequest privateTodoUpdateRequest) {
@@ -81,10 +80,7 @@ public class PrivateTodoService {
      * */
     @Transactional
     public void deletePrivateTodo(Long userPKId, Long privateTodoPKId) {
-        PrivateTodoEntity privateTodoEntity = privateTodoRepository.findByIdAndAuthorUserId(privateTodoPKId, userPKId).orElseThrow(
-            () -> SingletonException.PRIVATE_TODO_NOT_FOUND
-        );
-        privateTodoRepository.deleteById(privateTodoEntity.getId());
+        privateTodoRepository.deleteByIdAndAuthorUserId(privateTodoPKId, userPKId);
     }
 
 }

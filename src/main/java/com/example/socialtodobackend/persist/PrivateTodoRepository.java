@@ -11,6 +11,8 @@ public interface PrivateTodoRepository extends JpaRepository<PrivateTodoEntity, 
 
     Optional<PrivateTodoEntity> findByIdAndAuthorUserId(Long id, Long authorUserId);
 
+    void deleteByIdAndAuthorUserId(Long id, Long authorUserId);
+
     Slice<PrivateTodoEntity> findAllByAuthorUserId(Long authorUserId, PageRequest pageRequest);
 
 }

@@ -36,7 +36,7 @@ public class CommonUtils {
             }
         }
         if(dateInput.isBefore(LocalDate.now() ) ){
-            throw SingletonException.CANNOT_SET_PRIVATE_TODO_DEADLINE_ON_PAST;
+            throw SingletonException.CANNOT_SET_TODO_DEADLINE_ON_PAST;
         }
         if(dateInput.isAfter( LocalDate.now().plusDays(LONGEST_DEADLINE_DATE_LIMIT) )){
             throw SingletonException.CANNOT_SET_TODO_DEADLINE_AFTER_365DAYS;

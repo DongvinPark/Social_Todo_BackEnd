@@ -82,7 +82,6 @@ class AlarmServiceTest {
 
         //then
         verify(alarmRepository, times(1)).deleteByIdAndAlarmReceiverUserId(1L, 1L);
-
     }
 
 

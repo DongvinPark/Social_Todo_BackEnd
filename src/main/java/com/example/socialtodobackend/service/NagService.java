@@ -64,6 +64,8 @@ public class NagService {
         nagNumber--;
         publicTodoEntity.setNumberOfNag(nagNumber);
 
+        publicTodoRepository.save(publicTodoEntity);
+
         nagRepository.deleteByPublishedTodoPKIdAndNagSentUserPKId(
             publicTodoPKId, nagSentUserPKId
         );
@@ -82,6 +84,7 @@ public class NagService {
         //그후 유저 리포지토리에서 위에서 만든 주키 아이디 리스트에 포함되는 사람을 전부 찾아내서 페이징처리하여 보여준다.
         return userRepository.findAllByIdIn(nagSentUserPKIdList, PageRequest.of(0, CommonUtils.PAGE_SIZE)).getContent().stream().map(UserDto::fromEntity).collect(Collectors.toList());
     }
+
 
 
 }

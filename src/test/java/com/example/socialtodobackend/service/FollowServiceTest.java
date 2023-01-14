@@ -180,7 +180,7 @@ class FollowServiceTest {
 
 
     @Test
-    @DisplayName("팔로우 관계 추가 실패 - 5000명 초과하여 팔로우 함")
+    @DisplayName("팔로우 관계 추가 실패 - 5000명 초과하여 팔로우 하려고 함")
     void failed_addFollowInfo_FollowLimitExceed(){
         //given
         given(userRepository.existsById(anyLong())).willReturn(true);

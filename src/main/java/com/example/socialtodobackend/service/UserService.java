@@ -40,8 +40,7 @@ public class UserService {
      * 특정 유저의 회원가입을 처리한다.
      * JWT는 이때 전달하는 것이 아니라, 로그인을 성공했을 때만 전달해야 한다.
      * <br><br/>
-     * 닉네임의 유효성(영소문자와 숫자로만 구성)과 중복성 검사, 그리고 이메일 주소 중복 검사도 통과했으므로,
-     * 바로 등록시키면 된다.
+     * 닉네임의 유효성(영소문자와 숫자로만 구성)과 중복성 검사, 그리고 이메일 주소 중복 검사를 실시한다.
      * */
     @Transactional
     public UserDto registerUser(UserSignUpRequestDto userSignUpRequestDto) {
@@ -123,6 +122,7 @@ public class UserService {
      * */
     @Transactional
     public void updateUserStatusMessage(Long userPKId, String statusMessage) {
+        //수정할 때 불러올 엔티티가 필요하기 때문에 이 부분을 삭제할 수는 없다.
         UserEntity userEntity = userRepository.findById(userPKId).orElseThrow(
             () -> SingletonException.USER_NOT_FOUND
         );
@@ -162,7 +162,6 @@ public class UserService {
      * 영소문자도 아니고 숫자도 아닌 문자가 닉네임에 섞여 있다면 예외를 던진다.
      * */
     private void validateNicknameString(String input){
-        log.info("닉네임 유효성 검증 메서드 호출");
         if(input==null || input.equals("")){
             throw SingletonException.INVALID_NICKNAME;
         }

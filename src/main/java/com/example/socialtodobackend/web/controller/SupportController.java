@@ -1,4 +1,4 @@
-package com.example.socialtodobackend.controller;
+package com.example.socialtodobackend.web.controller;
 
 import com.example.socialtodobackend.dto.APIDataResponse;
 import com.example.socialtodobackend.dto.user.UserDto;

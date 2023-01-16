@@ -18,6 +18,7 @@ public class CommonUtils {
     public static final int TODO_CONTENT_LENGTH_LIMIT = 100;
     public static final int  STATUS_MESSAGE_LENGTH_LIMIT = 50;
     public static final int LONGEST_DEADLINE_DATE_LIMIT = 365;
+    public static final int JWT_VALID_DAY_LENGTH = 7;
 
 
     /**

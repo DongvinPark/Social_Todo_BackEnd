@@ -2,8 +2,6 @@ package com.example.socialtodobackend.service;
 
 import com.example.socialtodobackend.dto.user.UserDto;
 import com.example.socialtodobackend.persist.NagEntity;
-import com.example.socialtodobackend.persist.PublicTodoEntity;
-import com.example.socialtodobackend.exception.SingletonException;
 import com.example.socialtodobackend.persist.NagRepository;
 import com.example.socialtodobackend.persist.PublicTodoRepository;
 import com.example.socialtodobackend.persist.UserRepository;
@@ -29,14 +27,10 @@ public class NagService {
      * */
     @Transactional
     public void addNag(Long nagSentUserPKId, Long publicTodoPKId) {
-        PublicTodoEntity publicTodoEntity = publicTodoRepository.findById(publicTodoPKId)
-            .orElseThrow(() -> SingletonException.PUBLIC_TODO_NOT_FOUND);
+        // 더 이상 공개 투두 아이템을 수정할 필요가 없다.
 
-        long nagNumber = publicTodoEntity.getNumberOfNag();
-        nagNumber++;
-        publicTodoEntity.setNumberOfNag(nagNumber);
-
-        publicTodoRepository.save(publicTodoEntity);
+        // 대신 이때 발생한 일을 카프카 프로듀서에 누적시킨다.
+        // 이때, 잔소리 리포지토리에 잔소리 누른 유저 엔티티를 저장해야 한다.
 
         nagRepository.save(
             NagEntity.builder()
@@ -55,16 +49,7 @@ public class NagService {
      * */
     @Transactional
     public void undoNag(Long nagSentUserPKId, Long publicTodoPKId) {
-        PublicTodoEntity publicTodoEntity = publicTodoRepository.findById(publicTodoPKId).orElseThrow(
-            () -> SingletonException.PUBLIC_TODO_NOT_FOUND
-        );
-
-        long nagNumber = publicTodoEntity.getNumberOfNag();
-        if(nagNumber == 0) throw SingletonException.CANNOT_DECREASE_NAG_NUMBER_BELLOW_ZERO;
-        nagNumber--;
-        publicTodoEntity.setNumberOfNag(nagNumber);
-
-        publicTodoRepository.save(publicTodoEntity);
+        //여기서도 더 이상 퍼블릭 투듀에 대한 이벤트를 처리할 필요가 없다.
 
         nagRepository.deleteByPublishedTodoPKIdAndNagSentUserPKId(
             publicTodoPKId, nagSentUserPKId

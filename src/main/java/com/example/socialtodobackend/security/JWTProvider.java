@@ -1,6 +1,7 @@
 package com.example.socialtodobackend.security;
 
 import com.example.socialtodobackend.persist.UserEntity;
+import com.example.socialtodobackend.utils.CommonUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -20,8 +21,8 @@ public class JWTProvider {
      * JWT를 생성한다.
      * */
     public String create(UserEntity userEntity){
-        //Jwt의 만료기한을 24시간으로 설정
-        Date expiryDate = Date.from( Instant.now().plus(1, ChronoUnit.DAYS) );
+        //Jwt의 만료기한을 CommonUtils.JWT_VALID_DAY_LENGTH 로 설정한다.
+        Date expiryDate = Date.from( Instant.now().plus(CommonUtils.JWT_VALID_DAY_LENGTH, ChronoUnit.DAYS) );
 
         return Jwts.builder()
             .signWith(SignatureAlgorithm.HS512, SECRET_KEY)

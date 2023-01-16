@@ -10,6 +10,8 @@ public interface NagRepository extends JpaRepository<NagEntity, Long> {
 
     Slice<NagEntity> findAllByPublishedTodoPKId(Long publishedTodoPKId, PageRequest pageRequest);
 
+    void deleteAllByPublishedTodoPKId(Long publishedTodoPKId);
+
     void deleteByPublishedTodoPKIdAndNagSentUserPKId(Long publishedTodoPKId, Long nagSentUserPKId);
 
 }

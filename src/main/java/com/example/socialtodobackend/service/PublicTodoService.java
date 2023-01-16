@@ -3,10 +3,11 @@ package com.example.socialtodobackend.service;
 import com.example.socialtodobackend.dto.publictodo.PublicTodoCreateRequest;
 import com.example.socialtodobackend.dto.publictodo.PublicTodoDto;
 import com.example.socialtodobackend.dto.publictodo.PublicTodoUpdateRequest;
-import com.example.socialtodobackend.persist.PublicTodoEntity;
 import com.example.socialtodobackend.exception.SingletonException;
+import com.example.socialtodobackend.persist.NagRepository;
+import com.example.socialtodobackend.persist.PublicTodoEntity;
 import com.example.socialtodobackend.persist.PublicTodoRepository;
-import com.example.socialtodobackend.persist.UserRepository;
+import com.example.socialtodobackend.persist.SupportRepository;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,17 +23,19 @@ import org.springframework.transaction.annotation.Transactional;
 public class PublicTodoService {
 
     private final PublicTodoRepository publicTodoRepository;
-    private final UserRepository userRepository;
+    private final SupportRepository supportRepository;
+    private final NagRepository nagRepository;
 
 
 
     /**
      * 특정 유저가 작성한 모든 공개 투두 아이템들을 읽어들인다.
-     * 이때, 공개 투두 아이템 각각에 대한 응원/잔소리 정보도 같이 줘야 한다.
+     * 이때, 공개 투두 아이템 각각에 대한 응원/잔소리 정보를 레디스 캐시서버에서 가져와서 PublicTodoDto 구성에 사용해야 한다.
      * */
     @Transactional(readOnly = true)
     public List<PublicTodoDto> getAllPublicTodo(Long authorUserPKId, PageRequest pageRequest) {
 
+        //아래의 쿼리를 실행한 후, 레디스서버로부터 공개 투두 아이템마다 각각의 응원 및 좋아요 숫자를 가져와서 프런트 엔드에 넘겨야 한다.
         return publicTodoRepository.findAllByAuthorUserId(authorUserPKId, pageRequest).getContent().stream().map(PublicTodoDto::fromEntity).collect(Collectors.toList());
     }
 
@@ -53,8 +56,6 @@ public class PublicTodoService {
                 .todoContent(publicTodoCreateRequest.getPublicTodoContent())
                 .deadlineDate(publicTodoCreateRequest.getDeadlineDate())
                 .finished(false)
-                .numberOfSupport(0L)
-                .numberOfNag(0L)
                 .build()
         );
     }
@@ -91,10 +92,17 @@ public class PublicTodoService {
 
     /**
      * 공개 투두 아이템을 삭제한다.
+     *
+     * 공개 투두 아이템을 삭제할 때는 반드시 레디스를 확안해 봐야 한다.
+     * 해당 공개투두 아이템에 대하여 {공개 투두 주키:응원수} 와 {공개 투두 주키:잔소리수} 의 키-밸류 쌍이 존재할 경우 반드시 삭제해 줘야 하기 때문이다.
+     *
+     * 또한 특정 공개 투투 아이템을 삭제했을 경우, 그 아이템에 대하여 응원/잔소리를 누른 정보를 모두 삭제해야 한다.
      * */
     @Transactional
     public void removePublicTodo(Long authorUserPKId, Long publicTodoPKId) {
         publicTodoRepository.deleteByIdAndAuthorUserId(publicTodoPKId, authorUserPKId);
+        supportRepository.deleteAllByPublishedTodoPKId(publicTodoPKId);
+        nagRepository.deleteAllByPublishedTodoPKId(publicTodoPKId);
     }
 
 }

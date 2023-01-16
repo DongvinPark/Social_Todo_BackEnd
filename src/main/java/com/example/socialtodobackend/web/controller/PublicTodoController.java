@@ -1,4 +1,4 @@
-package com.example.socialtodobackend.controller;
+package com.example.socialtodobackend.web.controller;
 
 import com.example.socialtodobackend.dto.APIDataResponse;
 import com.example.socialtodobackend.dto.publictodo.PublicTodoCreateRequest;
@@ -50,6 +50,9 @@ public class PublicTodoController {
     public APIDataResponse< List<PublicTodoDto> > getAllPublicTodoList(
         @AuthenticationPrincipal Long authorUserPKId, @RequestParam int pageNumber
     ){
+        /**
+         * 레디스 서버를 사용해야 함을 기억하라!!
+         * */
         PageRequest pageRequest = PageRequest.of(pageNumber, CommonUtils.PAGE_SIZE);
         return APIDataResponse.of(
             publicTodoService.getAllPublicTodo(authorUserPKId, pageRequest)
@@ -75,6 +78,14 @@ public class PublicTodoController {
         @AuthenticationPrincipal Long authorUserPKId,
         @RequestParam Long publicTodoPKId
     ){
+        /**
+         * 이 때도 레디스에서 {투두 주키 : 응원수}와 {투두 주키 : 잔소리수} 이렇게 2 개의 키-밸류 쌍을 찾아내서 제거해야 하며,
+         * 응원/잔소리 해준 사람들 리포지토리에서 해당 투두 주키 아이디로 기록된 모든 엔티티들을 삭제해줘야 한다.
+         *
+         * 이 때도 카프카를 이용해서 공개 투두 딜리트 이벤트를 프로듀스 한다.
+         * 공개 투두 딜리트 이벤트 컨슈머 쪽에서는 publicTodoService.removePublicTodo(authorUserPKId, publicTodoPKId);
+         * 메서드에서 하는 일을 그대로 다 하면 된다.
+         * */
         publicTodoService.removePublicTodo(authorUserPKId, publicTodoPKId);
     }
 

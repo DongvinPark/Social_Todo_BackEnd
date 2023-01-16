@@ -46,8 +46,6 @@ public class PublicTodoDto {
             .modifiedAt(publicTodoEntity.getModifiedAt())
             .deadlineDate(publicTodoEntity.getDeadlineDate())
             .isFinished(publicTodoEntity.isFinished())
-            .numberOfSupport(publicTodoEntity.getNumberOfSupport())
-            .numberOfNag(publicTodoEntity.getNumberOfNag())
             .build();
     }
 

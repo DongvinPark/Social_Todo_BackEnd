@@ -5,12 +5,13 @@ import com.example.socialtodobackend.dto.user.UserDto;
 import com.example.socialtodobackend.dto.user.UserSignInRequestDto;
 import com.example.socialtodobackend.dto.user.UserSignInResponseDto;
 import com.example.socialtodobackend.dto.user.UserSignUpRequestDto;
-import com.example.socialtodobackend.entity.FollowEntity;
-import com.example.socialtodobackend.entity.UserEntity;
+import com.example.socialtodobackend.persist.FollowEntity;
+import com.example.socialtodobackend.persist.UserEntity;
 import com.example.socialtodobackend.exception.SingletonException;
-import com.example.socialtodobackend.repository.FollowRepository;
-import com.example.socialtodobackend.repository.PublicTodoRepository;
-import com.example.socialtodobackend.repository.UserRepository;
+import com.example.socialtodobackend.persist.FollowRepository;
+import com.example.socialtodobackend.persist.PublicTodoRepository;
+import com.example.socialtodobackend.persist.UserRepository;
+import com.example.socialtodobackend.persist.redis.JwtCacheRepository;
 import com.example.socialtodobackend.security.JWTProvider;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.time.LocalDate;
@@ -33,6 +34,7 @@ public class UserService {
     private final PublicTodoRepository publicTodoRepository;
     private final JWTProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
+    private final JwtCacheRepository jwtCacheRepository;
 
 
 
@@ -40,8 +42,7 @@ public class UserService {
      * 특정 유저의 회원가입을 처리한다.
      * JWT는 이때 전달하는 것이 아니라, 로그인을 성공했을 때만 전달해야 한다.
      * <br><br/>
-     * 닉네임의 유효성(영소문자와 숫자로만 구성)과 중복성 검사, 그리고 이메일 주소 중복 검사도 통과했으므로,
-     * 바로 등록시키면 된다.
+     * 닉네임의 유효성(영소문자와 숫자로만 구성)과 중복성 검사, 그리고 이메일 주소 중복 검사를 실시한다.
      * */
     @Transactional
     public UserDto registerUser(UserSignUpRequestDto userSignUpRequestDto) {
@@ -71,6 +72,11 @@ public class UserService {
         //getByCredentials() 메서드를 통과했다면, 유저 엔티티를 찾아내서 로그인 성공 처리를 진행 할 수 있다.
         String jwt = jwtProvider.create(originalUserEntity);
 
+        Long userPKId = jwtProvider.validateAndGetUserPKId(jwt);
+
+        //유저의 JWT를 레디스에 캐시해 둔다.
+        jwtCacheRepository.setJwtAtRedis(jwt, userPKId);
+
         return UserSignInResponseDto.fromEntity(originalUserEntity, jwt);
     }
 
@@ -97,6 +103,7 @@ public class UserService {
         // 오늘이 마감기한인데, 아직 왼료되지 않은 공개 투두 아이템 중에서
         // 작성자 주키 아이디가 followeeUserPKIdList 에 들어 있는 공개 투두 아이템을 publicTodoDto로 만들어서
         // 최종 리턴한다.
+        // 아래의 쿼리를 실행한 후, 레디스서버 로부터 각 공개 투두 아이템마다 응원/좋아요 숫자를 읽어와서 dto에 붙여줘야 한다.
         return publicTodoRepository.findAllByFinishedIsFalseAndDeadlineDateEqualsAndAuthorUserIdIn(
             LocalDate.now(), followeeUserPKIdList, pageRequest
         ).getContent().stream().map(PublicTodoDto::fromEntity).collect(Collectors.toList());
@@ -123,6 +130,7 @@ public class UserService {
      * */
     @Transactional
     public void updateUserStatusMessage(Long userPKId, String statusMessage) {
+        //수정할 때 불러올 엔티티가 필요하기 때문에 이 부분을 삭제할 수는 없다.
         UserEntity userEntity = userRepository.findById(userPKId).orElseThrow(
             () -> SingletonException.USER_NOT_FOUND
         );
@@ -162,7 +170,6 @@ public class UserService {
      * 영소문자도 아니고 숫자도 아닌 문자가 닉네임에 섞여 있다면 예외를 던진다.
      * */
     private void validateNicknameString(String input){
-        log.info("닉네임 유효성 검증 메서드 호출");
         if(input==null || input.equals("")){
             throw SingletonException.INVALID_NICKNAME;
         }
@@ -180,6 +187,8 @@ public class UserService {
 
     /**
      * 입력된 이메일 및 비번을 바탕으로 로그인 성공 여부를 판별하는 것에 사용되는 메서드다.
+     * 한 명의 유저의 입장에서는 Jwt를 발급 받는 순간(==로그인 하는 순간)에 딱 1번만 실행된다.
+     * 그 유저의 jwt가 유효할 때는 다시 jwt가 만료되지 않는 이상 다시 실행되지 않는다.
      * */
     private UserEntity getByCredentials(
         String userEmail, String password, PasswordEncoder passwordEncoder

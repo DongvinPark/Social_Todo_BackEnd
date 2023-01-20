@@ -1,5 +1,7 @@
 package com.example.socialtodobackend.configuration;
 
+import com.example.socialtodobackend.persist.UserRepository;
+import com.example.socialtodobackend.persist.redis.JwtCacheRepository;
 import com.example.socialtodobackend.security.JWTAuthenticationFilter;
 import com.example.socialtodobackend.security.JWTProvider;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,8 @@ import org.springframework.web.filter.CorsFilter;
 public class WebSecurityConfig {
 
     private final JWTProvider jwtProvider;
+    private final UserRepository userRepository;
+    private final JwtCacheRepository jwtCacheRepository;
 
 
     @Bean
@@ -35,7 +39,7 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         //log.info("필터체인 메서드 진입");
         httpSecurity
-            .cors() // 추후 리액트 등으로 만들어진 프런트 엔드와 통합해야 하므로 해당 옵션을 추가해 둔다.
+            .cors()
             .and()
             .csrf().disable()
             .httpBasic().disable()
@@ -50,7 +54,7 @@ public class WebSecurityConfig {
 
         //JWTAuthenticationFilter가 Cors 필터 다음에 동작하도록 설정해준다.
         //cors는 추후에 프런트엔드와 통합할 때 등장하는 개념이다.
-        httpSecurity.addFilterAfter(new JWTAuthenticationFilter(jwtProvider), CorsFilter.class);
+        httpSecurity.addFilterAfter(new JWTAuthenticationFilter(jwtProvider, userRepository, jwtCacheRepository), CorsFilter.class);
 
         //log.info("httpSecurity 필터 설정 완료.");
 

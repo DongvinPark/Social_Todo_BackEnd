@@ -37,6 +37,9 @@ public class UserController {
 
 
 
+    /**
+     * 유저가 최초로 로그인 성공했을 때 레디스에 해당 유저의 JWT를 캐시해 둔다.
+     * */
     @PostMapping("/sign-in")
     public APIDataResponse<UserSignInResponseDto> authenticate(
         @RequestBody UserSignInRequestDto signInRequestDto

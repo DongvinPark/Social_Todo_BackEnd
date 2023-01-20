@@ -2,6 +2,7 @@ package com.example.socialtodobackend.security;
 
 import com.example.socialtodobackend.exception.SingletonException;
 import com.example.socialtodobackend.persist.UserRepository;
+import com.example.socialtodobackend.persist.redis.JwtCacheRepository;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -26,6 +27,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
     private final JWTProvider jwtProvider;
     private final UserRepository userRepository;
+    private final JwtCacheRepository jwtCacheRepository;
 
 
     /**
@@ -44,24 +46,17 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                 //log.info("인증 완료 된 사용자의 주키 아이디 값 : " + userId);
 
                 //JWT에서 얻은 유저의 주키 아이디가 실존하는지를 판단한다.
-                //나중에 레디스로 캐시할 때는 DB 보다 레디스 클러스터를 먼저 보도록 코드를 수정한다.
-                if(userRepository.existsById(userId)){
-                    //이 부분을 통해서 컨트롤러 계층 메서드들의 파라미터들 중에서 @AuthenticationPrincipal 이 붙어 있는
-                    //매개변수들에게 값을 넘겨줄 수 있다.
-                    AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userId,
-                        null,
-                        AuthorityUtils.NO_AUTHORITIES
-                    );
-
-                    authentication.setDetails( new WebAuthenticationDetailsSource().buildDetails(request) );
-
-                    SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-
-                    securityContext.setAuthentication(authentication);
-
-                    SecurityContextHolder.setContext(securityContext);
+                if(
+                    jwtCacheRepository.getJwtFromRedis(userId).equals(token)
+                ){
+                    //레디스에서 유저의 jwt를 찾을 수 있는 경우를 처리한다.
+                    //레디스에서 찾을 수 있는 경우 DB를 다시 들여다볼 필요가 없게 된다.
+                    setSecurityContextByUserPKId(request, userId);
+                } else if (userRepository.existsById(userId)) {
+                    //레디스에서 유저의 jwt를 찾지 못한 경우를 처리한다.
+                    setSecurityContextByUserPKId(request, userId);
                 } else {
+                    //레디스에서도 못 찾고, DB에서도 못찾았다면 등록되지 않은 유저다.
                     throw SingletonException.USER_NOT_FOUND;
                 }
             }//if
@@ -73,6 +68,25 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         filterChan.doFilter(request, response);
     }
 
+
+
+    private static void setSecurityContextByUserPKId(HttpServletRequest request, Long userId) {
+        //이 부분을 통해서 컨트롤러 계층 메서드들의 파라미터들 중에서 @AuthenticationPrincipal 이 붙어 있는
+        //매개변수들에게 값을 넘겨줄 수 있다.
+        AbstractAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+            userId,
+            null,
+            AuthorityUtils.NO_AUTHORITIES
+        );
+
+        authentication.setDetails( new WebAuthenticationDetailsSource().buildDetails(request) );
+
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(authentication);
+
+        SecurityContextHolder.setContext(securityContext);
+    }
 
 
     private String parseBearerToken(HttpServletRequest request) {

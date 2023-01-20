@@ -11,6 +11,7 @@ import com.example.socialtodobackend.exception.SingletonException;
 import com.example.socialtodobackend.persist.FollowRepository;
 import com.example.socialtodobackend.persist.PublicTodoRepository;
 import com.example.socialtodobackend.persist.UserRepository;
+import com.example.socialtodobackend.persist.redis.JwtCacheRepository;
 import com.example.socialtodobackend.security.JWTProvider;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.time.LocalDate;
@@ -33,6 +34,7 @@ public class UserService {
     private final PublicTodoRepository publicTodoRepository;
     private final JWTProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
+    private final JwtCacheRepository jwtCacheRepository;
 
 
 
@@ -69,6 +71,11 @@ public class UserService {
 
         //getByCredentials() 메서드를 통과했다면, 유저 엔티티를 찾아내서 로그인 성공 처리를 진행 할 수 있다.
         String jwt = jwtProvider.create(originalUserEntity);
+
+        Long userPKId = jwtProvider.validateAndGetUserPKId(jwt);
+
+        //유저의 JWT를 레디스에 캐시해 둔다.
+        jwtCacheRepository.setJwtAtRedis(jwt, userPKId);
 
         return UserSignInResponseDto.fromEntity(originalUserEntity, jwt);
     }

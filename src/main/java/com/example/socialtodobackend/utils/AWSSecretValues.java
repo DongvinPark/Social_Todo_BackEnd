@@ -10,6 +10,4 @@ public class AWSSecretValues {
 
     public static final String MSK_NAG_TOPIC = "";
 
-    public static final String MSK_DELETE_PUBLIC_TODO_TOPIC = "";
-
 }

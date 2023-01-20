@@ -29,4 +29,6 @@ public class SingletonException {
     public static final SocialTodoException EMAIL_ADDRESS_ALREADY_EXISTS = new SocialTodoException(ErrorCode.EMAIL_ADDRESS_ALREADY_EXISTS);
     public static final SocialTodoException STATUS_MESSAGE_TOO_LONG = new SocialTodoException(ErrorCode.STATUS_MESSAGE_TOO_LONG);
 
+    public static final SocialTodoException INVALID_KAFKA_MESSAGE = new SocialTodoException(ErrorCode.INVALID_KAFKA_MESSAGE);
+
 }

@@ -20,6 +20,9 @@ public class CommonUtils {
     public static final int LONGEST_DEADLINE_DATE_LIMIT = 365;
     public static final int JWT_VALID_DAY_LENGTH = 7;
 
+    public static final String KAFKA_MESSAGE_TYPE_SUPPORT = "SUPPORT";
+    public static final String KAFKA_MESSAGE_TYPE_NAG = "NAG";
+
 
     /**
      * 투두 컨텐츠의 길이는 0자 이상 100자 이내여야 한다.

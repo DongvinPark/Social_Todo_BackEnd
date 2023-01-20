@@ -39,6 +39,10 @@ public class PublicTodoEntity {
 
     private boolean finished;
 
+    private Long numberOfNag;
+
+    private Long numberOfSupport;
+
     @CreatedDate
     private LocalDateTime createdAt;
 

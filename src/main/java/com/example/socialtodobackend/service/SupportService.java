@@ -1,6 +1,8 @@
 package com.example.socialtodobackend.service;
 
 import com.example.socialtodobackend.dto.user.UserDto;
+import com.example.socialtodobackend.exception.SingletonException;
+import com.example.socialtodobackend.persist.PublicTodoEntity;
 import com.example.socialtodobackend.persist.PublicTodoRepository;
 import com.example.socialtodobackend.persist.SupportEntity;
 import com.example.socialtodobackend.persist.SupportRepository;
@@ -28,7 +30,15 @@ public class SupportService {
      * */
     @Transactional
     public void addSupport(Long supportSentUserPKId, Long publicTodoPKId) {
-        //더 이상 공개 투두 아이템을 수정할 필요가 없다. 대신 무슨 일을 해야 하는지에 대해서는 NagController에 자세히 기재하였다.
+        PublicTodoEntity publicTodoEntity = publicTodoRepository.findById(publicTodoPKId).orElseThrow(
+            () -> SingletonException.PUBLIC_TODO_NOT_FOUND
+        );
+
+        long supportNumber = publicTodoEntity.getNumberOfSupport();
+        supportNumber++;
+        publicTodoEntity.setNumberOfSupport(supportNumber);
+
+        publicTodoRepository.save(publicTodoEntity);
 
         supportRepository.save(
             SupportEntity.builder()
@@ -47,7 +57,16 @@ public class SupportService {
      * */
     @Transactional
     public void undoSupport(Long supportSentUserPKId, Long publicTodoPKId) {
-        //이 때도 더 이상 공개 투두 아이템을 수정할 필요가 없다. 대신 무슨 일을 해야 하는지에 대해서는 NagController에 기록하였다.
+        PublicTodoEntity publicTodoEntity = publicTodoRepository.findById(publicTodoPKId).orElseThrow(
+            () -> SingletonException.PUBLIC_TODO_NOT_FOUND
+        );
+
+        long supportNumber = publicTodoEntity.getNumberOfSupport();
+        if(supportNumber == 0) throw SingletonException.CANNOT_DECREASE_SUPPORT_NUMBER_BELLOW_ZERO;
+        supportNumber--;
+        publicTodoEntity.setNumberOfSupport(supportNumber);
+
+        publicTodoRepository.save(publicTodoEntity);
 
         supportRepository.deleteByPublishedTodoPKIdAndSupportSentUserPKId(
             publicTodoPKId, supportSentUserPKId

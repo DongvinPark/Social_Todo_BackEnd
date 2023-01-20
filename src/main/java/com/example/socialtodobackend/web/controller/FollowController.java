@@ -51,11 +51,6 @@ public class FollowController {
         @RequestParam Long followRelationTargetUserPKId
     ){
         //팔로우 정보를 저장한다.
-        /**
-         * 그러면서 동시에 레디스의 {유저 주키 : 그 유저가 팔로우한 다른 유저들의 주키 아이디 리스트} 이 키 밸류 쌍을 찾아내서
-         * 새롭게 추가된 팔로우 타겟 유저를 레디스 캐시 리스트에 추가해 둬야 한다.
-         * 레디스의 리스트는 LinkedList 자료구조이기 때문에 O(1)시간에 가능하다.
-         * */
         followService.addFollowInfo(followSentUserPKId, followRelationTargetUserPKId);
 
         //그 후 알림을 보낸다.
@@ -72,11 +67,6 @@ public class FollowController {
         @AuthenticationPrincipal Long requestUserPKId,
         @RequestParam Long unfollowTargetUserPKId
     ){
-        /**
-         * 그 후, 레디스의 {유저 주키 : 그 유저가 팔로우한 다른 유저들의 주키 아이디 리스트} 이 키 밸류 쌍을 찾아내서
-         * 새롭게 추가된 팔로우 타겟 유저를 레디스 캐시 리스트에서 삭제해야 한다.
-         * 레디스의 리스트는 LinkedList 자료구조이기 때문에 O(N)시간이 소요된다.
-         * */
         followService.deleteFollowInfo(requestUserPKId, unfollowTargetUserPKId);
     }
 

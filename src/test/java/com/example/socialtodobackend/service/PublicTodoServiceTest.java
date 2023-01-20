@@ -13,8 +13,10 @@ import com.example.socialtodobackend.dto.publictodo.PublicTodoCreateRequest;
 import com.example.socialtodobackend.dto.publictodo.PublicTodoDto;
 import com.example.socialtodobackend.dto.publictodo.PublicTodoUpdateRequest;
 import com.example.socialtodobackend.exception.SocialTodoException;
+import com.example.socialtodobackend.persist.NagRepository;
 import com.example.socialtodobackend.persist.PublicTodoEntity;
 import com.example.socialtodobackend.persist.PublicTodoRepository;
+import com.example.socialtodobackend.persist.SupportRepository;
 import com.example.socialtodobackend.type.ErrorCode;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.time.LocalDate;
@@ -36,6 +38,12 @@ class PublicTodoServiceTest {
 
     @Mock
     private PublicTodoRepository publicTodoRepository;
+
+    @Mock
+    private SupportRepository supportRepository;
+
+    @Mock
+    private NagRepository nagRepository;
 
     @InjectMocks
     private PublicTodoService publicTodoService;
@@ -269,12 +277,16 @@ class PublicTodoServiceTest {
     void success_RemovePublicTodo(){
         //given
         doNothing().when(publicTodoRepository).deleteByIdAndAuthorUserId(anyLong(), anyLong());
+        doNothing().when(supportRepository).deleteAllByPublishedTodoPKId(anyLong());
+        doNothing().when(nagRepository).deleteAllByPublishedTodoPKId(anyLong());
 
         //when
         publicTodoService.removePublicTodo(1L, 1L);
 
         //then
         verify(publicTodoRepository, times(1)).deleteByIdAndAuthorUserId(1L, 1L);
+        verify(supportRepository, times(1)).deleteAllByPublishedTodoPKId(1L);
+        verify(nagRepository, times(1)).deleteAllByPublishedTodoPKId(1L);
     }
 
 

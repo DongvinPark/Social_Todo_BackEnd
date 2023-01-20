@@ -92,11 +92,7 @@ public class PublicTodoService {
 
     /**
      * 공개 투두 아이템을 삭제한다.
-     *
-     * 공개 투두 아이템을 삭제할 때는 반드시 레디스를 확안해 봐야 한다.
-     * 해당 공개투두 아이템에 대하여 {공개 투두 주키:응원수} 와 {공개 투두 주키:잔소리수} 의 키-밸류 쌍이 존재할 경우 반드시 삭제해 줘야 하기 때문이다.
-     *
-     * 또한 특정 공개 투투 아이템을 삭제했을 경우, 그 아이템에 대하여 응원/잔소리를 누른 정보를 모두 삭제해야 한다.
+     * 삭제한 아이템에 대하여 응원/잔소리를 누른 정보를 모두 삭제해야 한다.
      * */
     @Transactional
     public void removePublicTodo(Long authorUserPKId, Long publicTodoPKId) {

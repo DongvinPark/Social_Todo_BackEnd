@@ -41,10 +41,6 @@ public class UserController {
     public APIDataResponse<UserSignInResponseDto> authenticate(
         @RequestBody UserSignInRequestDto signInRequestDto
     ){
-        /**
-         * 유저가 로그인에 성공했을 경우, 그 레디스 캐시에 {유저 주키 : 그 유저가 팔로우 하고 있는 다른 유저들의 주키 아이디 리스틑}
-         * 를 캐시해 둬야 한다. 유효기간은 JWT의 유효기간인 CommonUtils.JWT_VALID_DAY_LENGTH 의 값과 동일하게 혹은 더 짧게 설정한다.
-         * */
         return APIDataResponse.of(userService.authenticateUser(signInRequestDto));
     }
 
@@ -65,15 +61,6 @@ public class UserController {
     public APIDataResponse< List<PublicTodoDto> > getTimeLine(
         @AuthenticationPrincipal Long userPKId, @RequestParam int pageNumber
     ){
-        /**
-         * 레디스 캐시 서버로부터 {유저 주키 : 해당 유저가 팔로우한 다른 유저들의 주키 아이디 리스트} 키-밸류 썅을 찾아내서
-         * 타임라인 구성을 위한 쿼리에 사용해야 한다.
-         * 또한 쿼리로 구성된 엔티티 하나하나 마다 레디스 서버에서 {투두 주키 : 응원수} 와 {투두 주키 : 잔소리수} 키-밸류 쌍을 찾아내서
-         * PublicTodoDto 구성에 사용해야 한다.
-         *
-         * 이때 레디스에서 {투두 주키 : 응원수} 와 {투두 주키 : 잔소리수} 키-밸류 쌍을 찾지 못한 경우 PublicTodoDto의 응원/잔소리 숫자 모두를
-         * 0L로 설정하면 된다.
-         * */
         PageRequest pageRequest = PageRequest.of(pageNumber, CommonUtils.PAGE_SIZE);
         return APIDataResponse.of(userService.makeTimeLine(userPKId, pageRequest));
     }

@@ -89,9 +89,6 @@ public class UserService {
         // userPKId 번호를 주키로 가지고 있는 유저가 팔로우를 한 다른 모든 유저들의 주키 아이디 번호를 찾아낸다.
         // 이 숫자는 5000을 초과할 수 없으므로, 일단 전부 담아 둔다.
         //페이징을 사용하지 않는 버전의 메서드를 호출한다.
-
-        //유저의 PK 아이디 리스트를 레디스에 캐시해 놓고 가져오면 아래의 쿼리는 더 이상 필요 없게 된다.
-        //캐시 히트일 때는 레디스로부터 그대로 가져와서 쓰면 되고, 캐시 미스일 때는 아래의 쿼리를 실행시키면 된다.
         List<Long> followeeUserPKIdList = followRepository.findAllByFollowSentUserId(userPKId).stream().map(FollowEntity::getFollowReceivedUserId).collect(Collectors.toList());
 
         // 위에서 찾아낸 followeeUserPKIdList 를

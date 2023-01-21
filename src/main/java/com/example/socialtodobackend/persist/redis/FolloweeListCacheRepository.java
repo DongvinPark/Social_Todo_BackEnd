@@ -29,7 +29,6 @@ public class FolloweeListCacheRepository {
     }
 
 
-
     //DB로부터 특정 유저가 팔로우한 사람들의 주키 아이디 값 리스트를 받아서 레디스에 저장한다.
     public void setFolloweeList(List<Long> pkIdList, Long userPKId) {
         log.info("팔로이 리스트 셋팅 진입");
@@ -42,6 +41,13 @@ public class FolloweeListCacheRepository {
             template.opsForList().rightPush(key, String.valueOf(id));
         }
         log.info("레디스에 팔로이 리스트 캐시 완료.");
+    }
+
+
+    //새로운 팔로우관계가 발생했을 경우, 처리해준다.
+    public void addNewFollowee(Long userPKId, Long followeePKId){
+        String key = getKey(userPKId);
+        template.opsForList().rightPush(key, String.valueOf(followeePKId));
     }
 
 

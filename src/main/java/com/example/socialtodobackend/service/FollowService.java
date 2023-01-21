@@ -5,6 +5,7 @@ import com.example.socialtodobackend.exception.SingletonException;
 import com.example.socialtodobackend.persist.FollowEntity;
 import com.example.socialtodobackend.persist.FollowRepository;
 import com.example.socialtodobackend.persist.UserRepository;
+import com.example.socialtodobackend.persist.redis.FolloweeListCacheRepository;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ public class FollowService {
 
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
+    private final FolloweeListCacheRepository followeeListCacheRepository;
 
 
     /**
@@ -73,6 +75,11 @@ public class FollowService {
 
         if(followRepository.countAllByFollowSentUserId(followSentUserPKId).equals(CommonUtils.FOLLOW_LIMIT)){
             throw SingletonException.CANNOT_FOLLOW_MORE_THAN_5000_USERS;
+        }
+
+        //캐시 히트라면, 캐시에 저장해준다.
+        if(followeeListCacheRepository.isFolloweeListCacheHit(followSentUserPKId)){
+            followeeListCacheRepository.addNewFollowee(followSentUserPKId, followRelationTargetUserPKId);
         }
 
         followRepository.save(

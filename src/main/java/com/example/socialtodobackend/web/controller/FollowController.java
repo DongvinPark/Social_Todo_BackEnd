@@ -38,6 +38,10 @@ public class FollowController {
         @AuthenticationPrincipal Long userPKId,
         @RequestParam int pageNumber
     ){
+
+        /**
+         * 내가 팔로우 하고 있는 사람들을 찾는다. 레디스에서 바로 찾을 수 있다. 없으면 DB 보면서 레디스에도 set 한다.
+         * */
         PageRequest pageRequest = PageRequest.of(pageNumber, CommonUtils.PAGE_SIZE);
         return APIDataResponse.of( followService.getFollowees(userPKId, pageRequest) );
     }

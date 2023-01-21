@@ -8,9 +8,11 @@ import com.example.socialtodobackend.persist.NagRepository;
 import com.example.socialtodobackend.persist.PublicTodoEntity;
 import com.example.socialtodobackend.persist.PublicTodoRepository;
 import com.example.socialtodobackend.persist.SupportRepository;
+import com.example.socialtodobackend.persist.redis.numbers.NagNumberCacheRepository;
+import com.example.socialtodobackend.persist.redis.numbers.SupportNumberCacheRepository;
 import com.example.socialtodobackend.utils.CommonUtils;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -25,6 +27,8 @@ public class PublicTodoService {
     private final PublicTodoRepository publicTodoRepository;
     private final SupportRepository supportRepository;
     private final NagRepository nagRepository;
+    private final SupportNumberCacheRepository supportNumberCacheRepository;
+    private final NagNumberCacheRepository nagNumberCacheRepository;
 
 
 
@@ -34,22 +38,30 @@ public class PublicTodoService {
      * */
     @Transactional(readOnly = true)
     public List<PublicTodoDto> getAllPublicTodo(Long authorUserPKId, PageRequest pageRequest) {
-
-        //아래의 쿼리를 실행한 후, 레디스서버로부터 공개 투두 아이템마다 각각의 응원 및 좋아요 숫자를 가져와서 프런트 엔드에 넘겨야 한다.
-        return publicTodoRepository.findAllByAuthorUserId(authorUserPKId, pageRequest).getContent().stream().map(PublicTodoDto::fromEntity).collect(Collectors.toList());
+        List<PublicTodoDto> publicTodoDtoList = new ArrayList<>();
+        for(PublicTodoEntity entity : publicTodoRepository.findAllByAuthorUserId(authorUserPKId, pageRequest)){
+            publicTodoDtoList.add(
+                PublicTodoDto.fromEntity(
+                    entity,
+                    supportNumberCacheRepository.getSupportNumber(entity.getId()),
+                    nagNumberCacheRepository.getNagNumber(entity.getId())
+                )
+            );
+        }
+        return publicTodoDtoList;
     }
 
 
 
 
     /**
-     * 공개 투두 아이템을 추가한다.
+     * 공개 투두 아이템을 추가한다. 레디스에도 응원 및 잔소리 기록용 키밸류 쌍을 저장한다.
      * */
     @Transactional
     public void addPublicTodo(Long authorUserPKId, PublicTodoCreateRequest publicTodoCreateRequest) {
         CommonUtils.validateContentLengthAndDeadlineDate(publicTodoCreateRequest.getPublicTodoContent(), publicTodoCreateRequest.getDeadlineDate());
 
-        publicTodoRepository.save(
+        PublicTodoEntity publicTodoEntity = publicTodoRepository.save(
             PublicTodoEntity.builder()
                 .authorUserId(authorUserPKId)
                 .authorNickname(publicTodoCreateRequest.getAuthorUserNickname())
@@ -58,6 +70,9 @@ public class PublicTodoService {
                 .finished(false)
                 .build()
         );
+
+        supportNumberCacheRepository.setInitialSupport(publicTodoEntity.getId());
+        nagNumberCacheRepository.setInitialNag(publicTodoEntity.getId());
     }
 
 
@@ -93,11 +108,17 @@ public class PublicTodoService {
     /**
      * 공개 투두 아이템을 삭제한다.
      * 삭제한 아이템에 대하여 응원/잔소리를 누른 정보를 모두 삭제해야 한다.
+     * 레디스 리포지토리도 검사하여 해당 공개 투두 아이템의 응원 및 잔소리 수를 기록한 레디스 키-값 쌍 두 개를 제거해야 한다.
      * */
     @Transactional
     public void removePublicTodo(Long authorUserPKId, Long publicTodoPKId) {
         publicTodoRepository.deleteByIdAndAuthorUserId(publicTodoPKId, authorUserPKId);
+
+        supportNumberCacheRepository.deleteSupportNumberInfo(publicTodoPKId);
+        nagNumberCacheRepository.deleteNagNumberInfo(publicTodoPKId);
+
         supportRepository.deleteAllByPublishedTodoPKId(publicTodoPKId);
+
         nagRepository.deleteAllByPublishedTodoPKId(publicTodoPKId);
     }
 

@@ -47,7 +47,7 @@ public class FollowService {
 
 
     /**
-     * 특정 유저가 팔로우를 한 모든 사람들을 확인한다.
+     * 특정 유저가 팔로우를 한 모든 사람들을 확인한다. 캐시를 먼저 보고, 없다면 DB를 본 후에 캐시 등록도 마친다.
      * 여기서도 페이징 로직을 적용한다.
      * */
     @Transactional(readOnly = true)

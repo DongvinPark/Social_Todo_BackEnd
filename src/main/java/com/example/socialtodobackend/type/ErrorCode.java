@@ -32,7 +32,8 @@ public enum ErrorCode {
     EMAIL_ADDRESS_ALREADY_EXISTS("해당 이메일 주소로 가입한 회원이 존재합니다."),
     AUTHENTICATION_FAILED("인증에 실패했습니다."),
     STATUS_MESSAGE_TOO_LONG("상태 메시지의 최대 길이는 50자를 초과할 수 없습니다."),
-    INVALID_KAFKA_MESSAGE("유효하지 않은 메시지 입니다.");
+    INVALID_KAFKA_MESSAGE("유효하지 않은 메시지 입니다."),
+    REDIS_GET_OPERATION_FAILED("캐시 서버에서 값을 가져오지 못했습니다.");
 
     private final String description;
 }

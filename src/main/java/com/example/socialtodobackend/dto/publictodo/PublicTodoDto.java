@@ -36,7 +36,7 @@ public class PublicTodoDto {
 
     private Long numberOfNag;
 
-    public static PublicTodoDto fromEntity(PublicTodoEntity publicTodoEntity){
+    public static PublicTodoDto fromEntity(PublicTodoEntity publicTodoEntity, Long numberOfSupport, Long numberOfNag){
         return PublicTodoDto.builder()
             .publicTodoPKId(publicTodoEntity.getId())
             .authorUserPKId(publicTodoEntity.getAuthorUserId())
@@ -46,6 +46,8 @@ public class PublicTodoDto {
             .modifiedAt(publicTodoEntity.getModifiedAt())
             .deadlineDate(publicTodoEntity.getDeadlineDate())
             .isFinished(publicTodoEntity.isFinished())
+            .numberOfSupport(numberOfSupport)
+            .numberOfNag(numberOfNag)
             .build();
     }
 

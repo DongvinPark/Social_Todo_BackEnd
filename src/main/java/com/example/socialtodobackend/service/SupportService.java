@@ -2,11 +2,11 @@ package com.example.socialtodobackend.service;
 
 import com.example.socialtodobackend.dto.user.UserDto;
 import com.example.socialtodobackend.exception.SingletonException;
-import com.example.socialtodobackend.persist.PublicTodoEntity;
 import com.example.socialtodobackend.persist.PublicTodoRepository;
 import com.example.socialtodobackend.persist.SupportEntity;
 import com.example.socialtodobackend.persist.SupportRepository;
 import com.example.socialtodobackend.persist.UserRepository;
+import com.example.socialtodobackend.persist.redis.numbers.SupportNumberCacheRepository;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,23 +22,16 @@ public class SupportService {
     private final PublicTodoRepository publicTodoRepository;
     private final SupportRepository supportRepository;
     private final UserRepository userRepository;
+    private final SupportNumberCacheRepository supportNumberCacheRepository;
 
 
 
     /**
-     * 응원을 하나 누른다.
+     * 응원을 하나 누른다. 레디스에도 기록한다.
      * */
     @Transactional
     public void addSupport(Long supportSentUserPKId, Long publicTodoPKId) {
-        PublicTodoEntity publicTodoEntity = publicTodoRepository.findById(publicTodoPKId).orElseThrow(
-            () -> SingletonException.PUBLIC_TODO_NOT_FOUND
-        );
-
-        long supportNumber = publicTodoEntity.getNumberOfSupport();
-        supportNumber++;
-        publicTodoEntity.setNumberOfSupport(supportNumber);
-
-        publicTodoRepository.save(publicTodoEntity);
+        supportNumberCacheRepository.plusOneSupport(publicTodoPKId);
 
         supportRepository.save(
             SupportEntity.builder()
@@ -52,21 +45,16 @@ public class SupportService {
 
 
     /**
-     * 기존에 눌렀던 응원을 취소시킨다.
+     * 기존에 눌렀던 응원을 취소시킨다. 레디스에서도 숫자를 감소시킨다.
      * 취소 후 따로 알림을 보내지는 않고, 취소시키기 이전의 응원으로 인해서 전송된 알림에 대해서도 별도의 수정을 하지 않는다.
      * */
     @Transactional
     public void undoSupport(Long supportSentUserPKId, Long publicTodoPKId) {
-        PublicTodoEntity publicTodoEntity = publicTodoRepository.findById(publicTodoPKId).orElseThrow(
-            () -> SingletonException.PUBLIC_TODO_NOT_FOUND
-        );
+        if( Long.parseLong(String.valueOf(supportNumberCacheRepository.getSupportNumber(publicTodoPKId))) == 0L ){
+            throw SingletonException.CANNOT_DECREASE_SUPPORT_NUMBER_BELLOW_ZERO;
+        }
 
-        long supportNumber = publicTodoEntity.getNumberOfSupport();
-        if(supportNumber == 0) throw SingletonException.CANNOT_DECREASE_SUPPORT_NUMBER_BELLOW_ZERO;
-        supportNumber--;
-        publicTodoEntity.setNumberOfSupport(supportNumber);
-
-        publicTodoRepository.save(publicTodoEntity);
+        supportNumberCacheRepository.minusOneSupport(publicTodoPKId);
 
         supportRepository.deleteByPublishedTodoPKIdAndSupportSentUserPKId(
             publicTodoPKId, supportSentUserPKId

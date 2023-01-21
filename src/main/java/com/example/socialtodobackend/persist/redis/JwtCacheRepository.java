@@ -1,5 +1,6 @@
 package com.example.socialtodobackend.persist.redis;
 
+import com.example.socialtodobackend.utils.AWSSecretValues;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class JwtCacheRepository {
 
 
     private String getKey(Long userPKId){
-        return "USER:JWT:" + userPKId;
+        return AWSSecretValues.REDIS_KEY_PREFIX_USER_JWT + userPKId;
     }
 
 

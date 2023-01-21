@@ -5,16 +5,21 @@ import com.example.socialtodobackend.dto.user.UserDto;
 import com.example.socialtodobackend.dto.user.UserSignInRequestDto;
 import com.example.socialtodobackend.dto.user.UserSignInResponseDto;
 import com.example.socialtodobackend.dto.user.UserSignUpRequestDto;
-import com.example.socialtodobackend.persist.FollowEntity;
-import com.example.socialtodobackend.persist.UserEntity;
 import com.example.socialtodobackend.exception.SingletonException;
+import com.example.socialtodobackend.persist.FollowEntity;
 import com.example.socialtodobackend.persist.FollowRepository;
+import com.example.socialtodobackend.persist.PublicTodoEntity;
 import com.example.socialtodobackend.persist.PublicTodoRepository;
+import com.example.socialtodobackend.persist.UserEntity;
 import com.example.socialtodobackend.persist.UserRepository;
+import com.example.socialtodobackend.persist.redis.FolloweeListCacheRepository;
 import com.example.socialtodobackend.persist.redis.JwtCacheRepository;
+import com.example.socialtodobackend.persist.redis.numbers.NagNumberCacheRepository;
+import com.example.socialtodobackend.persist.redis.numbers.SupportNumberCacheRepository;
 import com.example.socialtodobackend.security.JWTProvider;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +40,9 @@ public class UserService {
     private final JWTProvider jwtProvider;
     private final PasswordEncoder passwordEncoder;
     private final JwtCacheRepository jwtCacheRepository;
+    private final FolloweeListCacheRepository followeeListCacheRepository;
+    private final SupportNumberCacheRepository supportNumberCacheRepository;
+    private final NagNumberCacheRepository nagNumberCacheRepository;
 
 
 
@@ -89,24 +97,44 @@ public class UserService {
      * "특정 유저가 팔로우한 모든 다른 유저들이 올려 놓은 공개 투두 아이템들 중에서 마감기한이 오늘에 해당하면서 아직 완료되지 않은 공개투두 아이템들"
      * 을 구성해서 리턴하면 된다.
      * <br><br/>
-     * 타임라인을 캐싱해야 할지 말아야 할지는 별도로 테스트 해본 후에 판단한다.
+     * 레디스 캐시 미스일 때만 DB를 본다.
      * */
     @Transactional(readOnly = true)
     public List<PublicTodoDto> makeTimeLine(Long userPKId, PageRequest pageRequest) {
-        // userPKId 번호를 주키로 가지고 있는 유저가 팔로우를 한 다른 모든 유저들의 주키 아이디 번호를 찾아낸다.
-        // 이 숫자는 5000을 초과할 수 없으므로, 일단 전부 담아 둔다.
-        //페이징을 사용하지 않는 버전의 메서드를 호출한다.
-        List<Long> followeeUserPKIdList = followRepository.findAllByFollowSentUserId(userPKId).stream().map(FollowEntity::getFollowReceivedUserId).collect(Collectors.toList());
+        List<Long> followeeUserPKIdList;
+        if(followeeListCacheRepository.isFolloweeListCacheHit(userPKId)){
+            //캐시 히트
+            followeeUserPKIdList = followeeListCacheRepository.getFolloweeList(userPKId);
+        } else {
+            //캐시 미스
+            // userPKId 번호를 주키로 가지고 있는 유저가 팔로우를 한 다른 모든 유저들의 주키 아이디 번호를 찾아낸다.
+            // 이 숫자는 5000을 초과할 수 없으므로, 일단 전부 담아 둔다.
+            //페이징을 사용하지 않는 버전의 메서드를 호출한다.
+            followeeUserPKIdList = followRepository.findAllByFollowSentUserId(userPKId).stream().map(FollowEntity::getFollowReceivedUserId).collect(Collectors.toList());
+
+            //그 후, 다음 호출을 위해서 레디스 캐시에 등록한다.
+            followeeListCacheRepository.setFolloweeList(followeeUserPKIdList, userPKId);
+        }
 
         // 위에서 찾아낸 followeeUserPKIdList 를
         // findAllByFinishedEqualsAndDeadlineDateEqualsAndAuthorUserIdIn() 메서드에 전달하여
         // 오늘이 마감기한인데, 아직 왼료되지 않은 공개 투두 아이템 중에서
-        // 작성자 주키 아이디가 followeeUserPKIdList 에 들어 있는 공개 투두 아이템을 publicTodoDto로 만들어서
+        // 작성자 주키 아이디가 followeeUserPKIdList 에 들어 있는 공개 투두 아이템을 publicTodoDto로 만들고, 각 아이템의 응원 및 잔소리 개수 붙여서
         // 최종 리턴한다.
         // 아래의 쿼리를 실행한 후, 레디스서버 로부터 각 공개 투두 아이템마다 응원/좋아요 숫자를 읽어와서 dto에 붙여줘야 한다.
-        return publicTodoRepository.findAllByFinishedIsFalseAndDeadlineDateEqualsAndAuthorUserIdIn(
-            LocalDate.now(), followeeUserPKIdList, pageRequest
-        ).getContent().stream().map(PublicTodoDto::fromEntity).collect(Collectors.toList());
+        List<PublicTodoDto> publicTodoDtoList = new ArrayList<>();
+        for(
+            PublicTodoEntity entity : publicTodoRepository.findAllByFinishedIsFalseAndDeadlineDateEqualsAndAuthorUserIdIn(LocalDate.now(), followeeUserPKIdList, pageRequest)
+        ){
+            publicTodoDtoList.add(
+                PublicTodoDto.fromEntity(
+                    entity,
+                    supportNumberCacheRepository.getSupportNumber(entity.getId()),
+                    nagNumberCacheRepository.getNagNumber(entity.getId())
+                )
+            );
+        }
+        return publicTodoDtoList;
     }
 
 

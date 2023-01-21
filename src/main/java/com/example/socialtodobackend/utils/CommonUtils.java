@@ -19,9 +19,7 @@ public class CommonUtils {
     public static final int  STATUS_MESSAGE_LENGTH_LIMIT = 50;
     public static final int LONGEST_DEADLINE_DATE_LIMIT = 365;
     public static final int JWT_VALID_DAY_LENGTH = 7;
-
-    public static final String KAFKA_MESSAGE_TYPE_SUPPORT = "SUPPORT";
-    public static final String KAFKA_MESSAGE_TYPE_NAG = "NAG";
+    public static final int USER_FOLLOWEE_LIST_VALID_DAY_LENGTH = 1;
 
 
     /**

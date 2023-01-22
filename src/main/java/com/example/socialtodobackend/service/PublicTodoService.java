@@ -11,8 +11,8 @@ import com.example.socialtodobackend.persist.SupportRepository;
 import com.example.socialtodobackend.persist.redis.numbers.NagNumberCacheRepository;
 import com.example.socialtodobackend.persist.redis.numbers.SupportNumberCacheRepository;
 import com.example.socialtodobackend.utils.CommonUtils;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -38,17 +38,13 @@ public class PublicTodoService {
      * */
     @Transactional(readOnly = true)
     public List<PublicTodoDto> getAllPublicTodo(Long authorUserPKId, PageRequest pageRequest) {
-        List<PublicTodoDto> publicTodoDtoList = new ArrayList<>();
-        for(PublicTodoEntity entity : publicTodoRepository.findAllByAuthorUserId(authorUserPKId, pageRequest)){
-            publicTodoDtoList.add(
-                PublicTodoDto.fromEntity(
-                    entity,
-                    supportNumberCacheRepository.getSupportNumber(entity.getId()),
-                    nagNumberCacheRepository.getNagNumber(entity.getId())
-                )
-            );
-        }
-        return publicTodoDtoList;
+        return publicTodoRepository.findAllByAuthorUserId(authorUserPKId, pageRequest).getContent().stream().map(
+            publicTodoEntity -> PublicTodoDto.fromEntity(
+                publicTodoEntity,
+                supportNumberCacheRepository.getSupportNumber(publicTodoEntity.getId()),
+                nagNumberCacheRepository.getNagNumber(publicTodoEntity.getId())
+            )
+        ).collect(Collectors.toList());
     }
 
 

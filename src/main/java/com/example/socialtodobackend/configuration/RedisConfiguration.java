@@ -1,6 +1,5 @@
 package com.example.socialtodobackend.configuration;
 
-import com.example.socialtodobackend.utils.AWSSecretValues;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +17,8 @@ public class RedisConfiguration {
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory(){
-        LettuceConnectionFactory factory = new LettuceConnectionFactory(AWSSecretValues.REDIS_ENDPOINT, 6379);
+        LettuceConnectionFactory factory = new LettuceConnectionFactory("${spring.redis.url}",
+            Integer.parseInt("${spring.redis.port}"));
         factory.afterPropertiesSet();
         return factory;
     }

@@ -24,6 +24,10 @@ public class SupportController {
     private final AlarmService alarmService;
 
 
+    /**
+     * pressSupport()메서드 내의 서비스 계층 메서드 두 개에는 대량의 트래픽에 대한 비동기 처리를 위해서
+     * @Async 를 적용하였음.
+     * */
     @PutMapping("/create/support")
     public void pressSupport(
         @AuthenticationPrincipal Long supportSentUserPKId,

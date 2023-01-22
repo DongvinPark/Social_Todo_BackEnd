@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,9 @@ public class NagService {
 
     /**
      * 잔소리를 하나 추가한다. 레디스에도 기록한다.
+     * @Async를 적용해준다.
      * */
+    @Async
     @Transactional
     public void addNag(Long nagSentUserPKId, Long publicTodoPKId) {
         nagNumberCacheRepository.plusOneNag(publicTodoPKId);

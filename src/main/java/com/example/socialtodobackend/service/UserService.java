@@ -8,7 +8,6 @@ import com.example.socialtodobackend.dto.user.UserSignUpRequestDto;
 import com.example.socialtodobackend.exception.SingletonException;
 import com.example.socialtodobackend.persist.FollowEntity;
 import com.example.socialtodobackend.persist.FollowRepository;
-import com.example.socialtodobackend.persist.PublicTodoEntity;
 import com.example.socialtodobackend.persist.PublicTodoRepository;
 import com.example.socialtodobackend.persist.UserEntity;
 import com.example.socialtodobackend.persist.UserRepository;
@@ -19,7 +18,6 @@ import com.example.socialtodobackend.persist.redis.numbers.SupportNumberCacheRep
 import com.example.socialtodobackend.security.JWTProvider;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -122,19 +120,17 @@ public class UserService {
         // 작성자 주키 아이디가 followeeUserPKIdList 에 들어 있는 공개 투두 아이템을 publicTodoDto로 만들고, 각 아이템의 응원 및 잔소리 개수 붙여서
         // 최종 리턴한다.
         // 아래의 쿼리를 실행한 후, 레디스서버 로부터 각 공개 투두 아이템마다 응원/좋아요 숫자를 읽어와서 dto에 붙여줘야 한다.
-        List<PublicTodoDto> publicTodoDtoList = new ArrayList<>();
-        for(
-            PublicTodoEntity entity : publicTodoRepository.findAllByFinishedIsFalseAndDeadlineDateEqualsAndAuthorUserIdIn(LocalDate.now(), followeeUserPKIdList, pageRequest)
-        ){
-            publicTodoDtoList.add(
-                PublicTodoDto.fromEntity(
-                    entity,
-                    supportNumberCacheRepository.getSupportNumber(entity.getId()),
-                    nagNumberCacheRepository.getNagNumber(entity.getId())
-                )
-            );
-        }
-        return publicTodoDtoList;
+        return publicTodoRepository.findAllByFinishedIsFalseAndDeadlineDateEqualsAndAuthorUserIdIn(
+            LocalDate.now(),
+            followeeUserPKIdList,
+            pageRequest
+        ).getContent().stream().map(
+            publicTodoEntity -> PublicTodoDto.fromEntity(
+                publicTodoEntity,
+                supportNumberCacheRepository.getSupportNumber(publicTodoEntity.getId()),
+                nagNumberCacheRepository.getNagNumber(publicTodoEntity.getId())
+            )
+        ).collect(Collectors.toList());
     }
 
 

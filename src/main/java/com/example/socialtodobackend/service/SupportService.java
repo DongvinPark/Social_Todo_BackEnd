@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +29,9 @@ public class SupportService {
 
     /**
      * 응원을 하나 누른다. 레디스에도 기록한다.
+     * 대량트래픽에 대한 비동기 처리를 위해서 @Async를 적용함.
      * */
+    @Async
     @Transactional
     public void addSupport(Long supportSentUserPKId, Long publicTodoPKId) {
         supportNumberCacheRepository.plusOneSupport(publicTodoPKId);

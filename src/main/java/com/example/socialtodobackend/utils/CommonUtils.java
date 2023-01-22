@@ -20,6 +20,7 @@ public class CommonUtils {
     public static final int LONGEST_DEADLINE_DATE_LIMIT = 365;
     public static final int JWT_VALID_DAY_LENGTH = 7;
     public static final int USER_FOLLOWEE_LIST_VALID_DAY_LENGTH = 1;
+    public static final int NUMBER_OF_EXPECTED_MAX_REQUEST = 3350;
 
 
     /**

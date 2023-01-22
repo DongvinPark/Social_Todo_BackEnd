@@ -24,12 +24,16 @@ public class NagController {
     private final AlarmService alarmService;
 
 
+    /**
+     * pressNag() 메서드 내의 서비스 메서드 2개는 대량의 트래픽에 대한 비동기처리를 위해서
+     * @Async 를 적용하였음.
+     * */
     @PutMapping("/create/nag")
     public void pressNag(
         @AuthenticationPrincipal Long nagSentUserPKId,
         @RequestParam Long publicTodoPKId,
         @RequestParam Long todoAuthorUserPKId
-    ){
+    ) {
         nagService.addNag(nagSentUserPKId, publicTodoPKId);
         alarmService.sendNagInfoAlarm(nagSentUserPKId, publicTodoPKId, todoAuthorUserPKId);
     }

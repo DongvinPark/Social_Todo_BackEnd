@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,7 +97,9 @@ public class AlarmService {
      * 특정 공개 투두 아이템에 대해서 응원을 눌렀을 때, 투두 아이템 작성자에게 알림을 보내는 기능.
      * 해당 공개 투투 아이템에 대한 첫 응원일 경우 알림을 새로 보내줘야 하고,
      * 이미 다른 사람이 응원을 누른적이 있다면, 해당알림을 찾아서 숫자를 +1 해준다.
+     * 대량 트래픽에 대한 비동기 처리를 위해서 @Async를 적용함.
      * */
+    @Async
     @Transactional
     public void sendSupportInfoAlarm(Long supportSentUserPKId, Long publicTodoPKId, Long todoAuthorUserPKId) {
         //기존 알림이 있는지를 먼저 찾는다. 공개투두 아이템은 기존 알람이 없는 최초의 응원일 때만 찾아내면 된다.
@@ -134,19 +137,21 @@ public class AlarmService {
 
 
     /**
-     *
+     * 잔소리 누르기 요청에 대한 알림을 보낸다.
+     * @Async를 적용한다.
      * */
+    @Async
     @Transactional
     public void sendNagInfoAlarm(Long nagSentUserPKId, Long publicTodoPKId, Long todoAuthorUserPKId) {
         //기존 알림이 있는지를 먼저 찾는다. 공개투두 아이템은 기존 알람이 없는 최초의 응원일 때만 찾아내면 된다.
         //기존 알림이 있는지 찾아낼 때는 알림 엔티티의 relatedPublicTodoPKId와 alarmType이 있으면 된다.
         //각각의 모든 공개 투두 아이템에 대하여 발생 가능한 잔소리 알림은 0개 또는 단 1 개만 가능하기 때문이다.
-        Optional<com.example.socialtodobackend.persist.AlarmEntity> optionalAlarmEntity = alarmRepository.findAlarmEntityByRelatedPublicTodoPKIdEqualsAndAlarmTypeEquals(
+        Optional<AlarmEntity> optionalAlarmEntity = alarmRepository.findAlarmEntityByRelatedPublicTodoPKIdEqualsAndAlarmTypeEquals(
             publicTodoPKId, AlarmTypeCode.NAG
         );
         if(optionalAlarmEntity.isPresent()){
             //기존 알림이 존재한다. 잔소리 해준 사람 숫자만 += 1 해주면 된다.
-            com.example.socialtodobackend.persist.AlarmEntity alarmEntity = optionalAlarmEntity.get();
+            AlarmEntity alarmEntity = optionalAlarmEntity.get();
             long nagSentUserNumber = alarmEntity.getNumberOfPeopleRelatedToAlarm();
             nagSentUserNumber++;
             alarmEntity.setNumberOfPeopleRelatedToAlarm(nagSentUserNumber);
@@ -156,7 +161,7 @@ public class AlarmService {
             //프런트엔드에서 넘겨 받은 todoAuthorUserPKId를 이용해서 추가적인 DB I/O 없이 바로 새 알림을 저장한다.
 
             alarmRepository.save(
-                com.example.socialtodobackend.persist.AlarmEntity.builder()
+                AlarmEntity.builder()
                     .alarmReceiverUserId(todoAuthorUserPKId)
                     .alarmSenderUserId(nagSentUserPKId)
                     .numberOfPeopleRelatedToAlarm(1L)

@@ -1,6 +1,7 @@
 package com.example.socialtodobackend.configuration;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -14,11 +15,15 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @EnableRedisRepositories
 @RequiredArgsConstructor
 public class RedisConfiguration {
+    @Value("${aws.redis.url}")
+    private String redisURL;
+
+    @Value("${aws.redis.port}")
+    private int port;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory(){
-        LettuceConnectionFactory factory = new LettuceConnectionFactory("${spring.redis.url}",
-            Integer.parseInt("${spring.redis.port}"));
+        LettuceConnectionFactory factory = new LettuceConnectionFactory(redisURL, port);
         factory.afterPropertiesSet();
         return factory;
     }

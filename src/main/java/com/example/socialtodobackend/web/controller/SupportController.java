@@ -5,6 +5,7 @@ import com.example.socialtodobackend.dto.user.UserDto;
 import com.example.socialtodobackend.service.AlarmService;
 import com.example.socialtodobackend.service.SupportService;
 import com.example.socialtodobackend.utils.CommonUtils;
+import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ public class SupportController {
      * @Async 를 적용하였음.
      * */
     @PutMapping("/create/support")
+    @ApiOperation("특정 공개 투두 아이템에 대한 응원 버튼 누르기 처리 - @Async 적용함")
     public void pressSupport(
         @AuthenticationPrincipal Long supportSentUserPKId,
         @RequestParam Long publicTodoPKId,
@@ -41,6 +43,7 @@ public class SupportController {
 
 
     @PutMapping("/cancel/support")
+    @ApiOperation("눌렀던 응원을 취소함")
     public void cancelSupport(
         @AuthenticationPrincipal Long supportSentUserPKId,
         @RequestParam Long publicTodoPKId
@@ -55,6 +58,7 @@ public class SupportController {
      * @AuthenticationPrincipal 을 사용하면 안 된다.
      * */
     @GetMapping("/support/users")
+    @ApiOperation("특정 공개 투두 아이템에 대하여 응원 눌러준 유저 리스트 확인")
     public APIDataResponse< List<UserDto> > getSupportSentUsers(
         @RequestParam Long publicTodoPKId, @RequestParam int pageNumber
     ){

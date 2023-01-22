@@ -6,6 +6,7 @@ import com.example.socialtodobackend.dto.privatetodo.PrivateTodoDto;
 import com.example.socialtodobackend.dto.privatetodo.PrivateTodoUpdateRequest;
 import com.example.socialtodobackend.service.PrivateTodoService;
 import com.example.socialtodobackend.utils.CommonUtils;
+import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class PrivateTodoController {
 
 
     @PostMapping("/create/private/todo")
+    @ApiOperation("프라이빗 투두 생성")
     public APIDataResponse< List<PrivateTodoDto> > addPrivateTodo(
         @AuthenticationPrincipal Long authorUserPKId,
         @RequestBody @Valid PrivateTodoCreateRequest privateTodoCreateRequest
@@ -41,6 +43,7 @@ public class PrivateTodoController {
 
 
     @GetMapping("/private/todos")
+    @ApiOperation("프라이빗 투두 리스트 획득")
     public APIDataResponse<List<PrivateTodoDto>> getPrivateTodoList(
         @AuthenticationPrincipal Long authorUserPKId,
         @RequestParam int pageNumber
@@ -53,6 +56,7 @@ public class PrivateTodoController {
 
 
     @PutMapping("/update/private/todo")
+    @ApiOperation("프라이빗 투두 1개 수정")
     public void updatePrivateTodo(
         @AuthenticationPrincipal Long userPKId,
         @RequestBody @Valid PrivateTodoUpdateRequest privateTodoUpdateRequest
@@ -62,6 +66,7 @@ public class PrivateTodoController {
 
 
     @DeleteMapping("/private/todo")
+    @ApiOperation("프라이빗 투두 1개 삭제")
     public void removePrivateTodo(
         @AuthenticationPrincipal Long userPKId,
         @RequestParam Long privateTodoPKId

@@ -5,6 +5,7 @@ import com.example.socialtodobackend.dto.follow.UserFollowInfoDto;
 import com.example.socialtodobackend.service.AlarmService;
 import com.example.socialtodobackend.service.FollowService;
 import com.example.socialtodobackend.utils.CommonUtils;
+import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +25,7 @@ public class FollowController {
 
 
     @GetMapping("/followers")
+    @ApiOperation("특정 유저를 팔로우 하는 다른 유저들 리스트 요청")
     public APIDataResponse< List<UserFollowInfoDto> > getAllFollowersOfUser(
         @AuthenticationPrincipal Long userPKId, @RequestParam int pageNumber
     ){
@@ -34,6 +36,7 @@ public class FollowController {
 
 
     @GetMapping("/followees")
+    @ApiOperation("특정 유저가 팔로우 하는 다른 유저들 리스트 요청")
     public APIDataResponse< List<UserFollowInfoDto> >  getAllFolloweeUsers(
         @AuthenticationPrincipal Long userPKId,
         @RequestParam int pageNumber
@@ -50,6 +53,7 @@ public class FollowController {
 
 
     @PostMapping("/follow")
+    @ApiOperation("팔로우 관계 등록")
     public void createFollowRelation(
         @AuthenticationPrincipal Long followSentUserPKId,
         @RequestParam Long followRelationTargetUserPKId
@@ -67,6 +71,7 @@ public class FollowController {
      * 해당 사용자가 언팔로우 하고자 하는 대상 사용자의 주키 아이디를 @RequestParam으로 전달한다.
      * */
     @DeleteMapping("/delete/follow-relation")
+    @ApiOperation("팔로우 관계 정보를 삭제함으로서 언팔로우 구현")
     public void deleteFollowRelation(
         @AuthenticationPrincipal Long requestUserPKId,
         @RequestParam Long unfollowTargetUserPKId

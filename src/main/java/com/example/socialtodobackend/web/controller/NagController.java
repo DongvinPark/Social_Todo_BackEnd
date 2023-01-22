@@ -5,6 +5,7 @@ import com.example.socialtodobackend.dto.user.UserDto;
 import com.example.socialtodobackend.service.AlarmService;
 import com.example.socialtodobackend.service.NagService;
 import com.example.socialtodobackend.utils.CommonUtils;
+import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ public class NagController {
      * @Async 를 적용하였음.
      * */
     @PutMapping("/create/nag")
+    @ApiOperation("특정 공개 투투 아이템에 대하여 잔소리 버튼 누름 - @Async 처리 적용")
     public void pressNag(
         @AuthenticationPrincipal Long nagSentUserPKId,
         @RequestParam Long publicTodoPKId,
@@ -41,6 +43,7 @@ public class NagController {
 
 
     @PutMapping("/cancel/nag")
+    @ApiOperation("잔소리 눌렀던 동작 취소")
     public void cancelNag(
         @AuthenticationPrincipal Long nagSentUserPKId,
         @RequestParam Long publicTodoPKId
@@ -56,6 +59,7 @@ public class NagController {
      * 이때 조인 쿼리를 사용할 수 있게 하자.
      * */
     @GetMapping("/nag/users")
+    @ApiOperation("특정 공개 투두 아이템에 대하여 잔소리 버튼 누른 사람들 리스트 확인")
     public APIDataResponse< List<UserDto> > getNagSentUsers(
         @RequestParam Long publicTodoPKId,
         @RequestParam int pageNumber

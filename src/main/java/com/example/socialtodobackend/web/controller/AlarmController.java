@@ -4,6 +4,7 @@ import com.example.socialtodobackend.dto.APIDataResponse;
 import com.example.socialtodobackend.dto.alarm.AlarmDto;
 import com.example.socialtodobackend.service.AlarmService;
 import com.example.socialtodobackend.utils.CommonUtils;
+import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +22,7 @@ public class AlarmController {
 
 
     @GetMapping("/alarms")
+    @ApiOperation("특정 유저의 모든 알림 리스트 요청")
     public APIDataResponse< List<AlarmDto> > getAllAlarm(
         @AuthenticationPrincipal Long userPKId,
         @RequestParam int pageNumber
@@ -43,6 +45,7 @@ public class AlarmController {
      * 알림 하나를 삭제하는 동작을 마친 후, 굳이 전체 알림 리스트를 다시 불러오는 동작을 할 필요는 없다.
      * */
     @DeleteMapping("/alarm")
+    @ApiOperation("알림 1개 삭제")
     public void deleteOneAlarm(
         @AuthenticationPrincipal Long userPKId,
         @RequestParam Long alarmPKId
@@ -55,6 +58,7 @@ public class AlarmController {
      * 전체 알림을 삭제하는 동작을 마친 후, 굳이 다시 알림 리스트를 불러오는 동작을 할 필요는 없다.
      * */
     @DeleteMapping("/entire-alarms")
+    @ApiOperation("모든 알림 삭제")
     public void deleteAllAlarms(
         @AuthenticationPrincipal Long userPKId
     ){

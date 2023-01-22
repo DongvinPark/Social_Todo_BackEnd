@@ -6,7 +6,6 @@ import com.example.socialtodobackend.dto.publictodo.PublicTodoDto;
 import com.example.socialtodobackend.dto.publictodo.PublicTodoUpdateRequest;
 import com.example.socialtodobackend.service.PublicTodoService;
 import com.example.socialtodobackend.utils.CommonUtils;
-import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +30,6 @@ public class PublicTodoController {
 
 
     @PostMapping("/create/public/todo")
-    @ApiOperation("공개 투두 아이템 1개 생성")
     public APIDataResponse< List<PublicTodoDto> > createPublicTodo(
         @AuthenticationPrincipal Long authorUserPKId,
         @RequestBody @Valid PublicTodoCreateRequest publicTodoCreateRequest
@@ -49,7 +47,6 @@ public class PublicTodoController {
 
 
     @GetMapping("/public/todo")
-    @ApiOperation("공개 투두 아이템 리스트 요청")
     public APIDataResponse< List<PublicTodoDto> > getAllPublicTodoList(
         @AuthenticationPrincipal Long authorUserPKId, @RequestParam int pageNumber
     ){
@@ -66,7 +63,6 @@ public class PublicTodoController {
 
 
     @PutMapping("/update/public/todo")
-    @ApiOperation("공개 투두 아이템 1개 수정")
     public void updatePublicTodo(
         @AuthenticationPrincipal Long authorUserPKId,
         @RequestBody @Valid PublicTodoUpdateRequest publicTodoDto
@@ -78,7 +74,6 @@ public class PublicTodoController {
 
 
     @DeleteMapping("/public/todo")
-    @ApiOperation("공개 투두 아이템 1개 삭제")
     public void deletePublicTodo(
         @AuthenticationPrincipal Long authorUserPKId,
         @RequestParam Long publicTodoPKId

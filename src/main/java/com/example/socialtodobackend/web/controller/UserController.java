@@ -8,7 +8,6 @@ import com.example.socialtodobackend.dto.user.UserSignInResponseDto;
 import com.example.socialtodobackend.dto.user.UserSignUpRequestDto;
 import com.example.socialtodobackend.service.UserService;
 import com.example.socialtodobackend.utils.CommonUtils;
-import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -29,7 +28,6 @@ public class UserController {
 
 
     @PostMapping("/sign-up")
-    @ApiOperation("회원 가입 처리")
     public APIDataResponse<UserDto> signUp(
         @RequestBody UserSignUpRequestDto userDto
     ){
@@ -43,7 +41,6 @@ public class UserController {
      * 유저가 최초로 로그인 성공했을 때 레디스에 해당 유저의 JWT를 캐시해 둔다.
      * */
     @PostMapping("/sign-in")
-    @ApiOperation("로그인 처리")
     public APIDataResponse<UserSignInResponseDto> authenticate(
         @RequestBody UserSignInRequestDto signInRequestDto
     ){
@@ -54,7 +51,6 @@ public class UserController {
 
 
     @PutMapping("/update/status-message")
-    @ApiOperation("상태 메시지 수정 처리")
     public void updateStatusMessage(
         @AuthenticationPrincipal Long userPKId, @RequestParam String statusMessage
     ){
@@ -65,7 +61,6 @@ public class UserController {
 
 
     @GetMapping("/time-line")
-    @ApiOperation("타임라인 획득 처리")
     public APIDataResponse< List<PublicTodoDto> > getTimeLine(
         @AuthenticationPrincipal Long userPKId, @RequestParam int pageNumber
     ){
@@ -81,7 +76,6 @@ public class UserController {
      * @AuthenticationPrincipal 을 사용하면 안 된다.
      * */
     @GetMapping("/search/users")
-    @ApiOperation("유저 검색 요청 처리")
     public APIDataResponse< List<UserDto> > searchUsers(
         @RequestParam String userNickname,
         @RequestParam int pageNumber

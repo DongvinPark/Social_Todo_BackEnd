@@ -14,4 +14,4 @@ spring:
 
   redis:
     url: ""
-    port: 
+    port:

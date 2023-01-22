@@ -17,6 +17,8 @@ import com.example.socialtodobackend.persist.NagRepository;
 import com.example.socialtodobackend.persist.PublicTodoEntity;
 import com.example.socialtodobackend.persist.PublicTodoRepository;
 import com.example.socialtodobackend.persist.SupportRepository;
+import com.example.socialtodobackend.persist.redis.numbers.NagNumberCacheRepository;
+import com.example.socialtodobackend.persist.redis.numbers.SupportNumberCacheRepository;
 import com.example.socialtodobackend.type.ErrorCode;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.time.LocalDate;
@@ -45,6 +47,12 @@ class PublicTodoServiceTest {
     @Mock
     private NagRepository nagRepository;
 
+    @Mock
+    private SupportNumberCacheRepository supportNumberCacheRepository;
+
+    @Mock
+    private NagNumberCacheRepository nagNumberCacheRepository;
+
     @InjectMocks
     private PublicTodoService publicTodoService;
 
@@ -70,6 +78,10 @@ class PublicTodoServiceTest {
         given(publicTodoRepository.findAllByAuthorUserId(
             1L, PageRequest.of(0, CommonUtils.PAGE_SIZE)
         )).willReturn(slice);
+
+        given(supportNumberCacheRepository.getSupportNumber(1L)).willReturn(0L);
+
+        given(nagNumberCacheRepository.getNagNumber(1L)).willReturn(0L);
 
         //when
         List<PublicTodoDto> publicTodoDtoList = publicTodoService.getAllPublicTodo(1L, PageRequest.of(0, CommonUtils.PAGE_SIZE));

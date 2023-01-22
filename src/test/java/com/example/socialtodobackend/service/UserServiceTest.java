@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 
 import com.example.socialtodobackend.dto.publictodo.PublicTodoDto;
 import com.example.socialtodobackend.dto.user.UserDto;
@@ -19,6 +20,10 @@ import com.example.socialtodobackend.persist.PublicTodoEntity;
 import com.example.socialtodobackend.persist.PublicTodoRepository;
 import com.example.socialtodobackend.persist.UserEntity;
 import com.example.socialtodobackend.persist.UserRepository;
+import com.example.socialtodobackend.persist.redis.FolloweeListCacheRepository;
+import com.example.socialtodobackend.persist.redis.JwtCacheRepository;
+import com.example.socialtodobackend.persist.redis.numbers.NagNumberCacheRepository;
+import com.example.socialtodobackend.persist.redis.numbers.SupportNumberCacheRepository;
 import com.example.socialtodobackend.security.JWTProvider;
 import com.example.socialtodobackend.type.ErrorCode;
 import com.example.socialtodobackend.utils.CommonUtils;
@@ -55,6 +60,18 @@ class UserServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private SupportNumberCacheRepository supportNumberCacheRepository;
+
+    @Mock
+    private NagNumberCacheRepository nagNumberCacheRepository;
+
+    @Mock
+    private JwtCacheRepository jwtCacheRepository;
+
+    @Mock
+    private FolloweeListCacheRepository followeeListCacheRepository;
 
     @InjectMocks
     private UserService userService;
@@ -214,6 +231,8 @@ class UserServiceTest {
 
         given(passwordEncoder.matches(anyString(), anyString())).willReturn(true);
 
+        doNothing().when(jwtCacheRepository).setJwtAtRedis(anyString(), anyLong());
+
         //when
         UserSignInResponseDto userSignInResponseDto = userService.authenticateUser(userSignInRequestDto);
 
@@ -297,6 +316,7 @@ class UserServiceTest {
         followEntityList.add(followEntity);
 
         PublicTodoEntity publicTodoEntity = PublicTodoEntity.builder()
+            .id(1L)
             .authorUserId(2L)
             .deadlineDate(LocalDate.now())
             .finished(false)
@@ -305,6 +325,8 @@ class UserServiceTest {
         List<PublicTodoEntity> publicTodoEntityList = new ArrayList<>();
         publicTodoEntityList.add(publicTodoEntity);
         Slice<PublicTodoEntity> todoSlice = new PageImpl<>(publicTodoEntityList);
+
+        given(followeeListCacheRepository.isFolloweeListCacheHit(1L)).willReturn(false);
 
         given(
             followRepository.findAllByFollowSentUserId(anyLong())
@@ -317,6 +339,10 @@ class UserServiceTest {
                 PageRequest.of(0, CommonUtils.PAGE_SIZE)
             )
         ).willReturn(todoSlice);
+
+        given(supportNumberCacheRepository.getSupportNumber(1L)).willReturn(0L);
+
+        given(nagNumberCacheRepository.getNagNumber(1L)).willReturn(0L);
 
         //when
         List<PublicTodoDto> publicTodoDtoList = userService.makeTimeLine(1L, PageRequest.of(0, CommonUtils.PAGE_SIZE));

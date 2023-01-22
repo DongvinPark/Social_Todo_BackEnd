@@ -15,6 +15,7 @@ import com.example.socialtodobackend.persist.FollowEntity;
 import com.example.socialtodobackend.persist.FollowRepository;
 import com.example.socialtodobackend.persist.UserEntity;
 import com.example.socialtodobackend.persist.UserRepository;
+import com.example.socialtodobackend.persist.redis.FolloweeListCacheRepository;
 import com.example.socialtodobackend.type.ErrorCode;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.util.ArrayList;
@@ -38,6 +39,9 @@ class FollowServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private FolloweeListCacheRepository followeeListCacheRepository;
 
     @InjectMocks
     private FollowService followService;
@@ -148,6 +152,10 @@ class FollowServiceTest {
 
         given(userRepository.existsById(1L)).willReturn(true);
 
+        given(followeeListCacheRepository.isFolloweeListCacheHit(2L)).willReturn(true);
+
+        doNothing().when(followeeListCacheRepository).addNewFollowee(2L, 1L);
+
         given(followRepository.save(any())).willReturn(followEntity);
 
         //when
@@ -155,6 +163,8 @@ class FollowServiceTest {
 
         //then
         verify(followRepository, times(1)).save(any());
+        verify(followeeListCacheRepository, times(1)).isFolloweeListCacheHit(anyLong());
+        verify(followeeListCacheRepository, times(1)).addNewFollowee(anyLong(), anyLong());
     }
 
 

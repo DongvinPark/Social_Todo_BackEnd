@@ -11,18 +11,19 @@ import static org.mockito.Mockito.verify;
 
 import com.example.socialtodobackend.dto.user.UserDto;
 import com.example.socialtodobackend.exception.SocialTodoException;
-import com.example.socialtodobackend.persist.PublicTodoEntity;
 import com.example.socialtodobackend.persist.PublicTodoRepository;
 import com.example.socialtodobackend.persist.SupportEntity;
 import com.example.socialtodobackend.persist.SupportRepository;
 import com.example.socialtodobackend.persist.UserEntity;
 import com.example.socialtodobackend.persist.UserRepository;
+import com.example.socialtodobackend.persist.redis.numbers.SupportNumberCacheRepository;
 import com.example.socialtodobackend.type.ErrorCode;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,6 +46,9 @@ class SupportServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private SupportNumberCacheRepository supportNumberCacheRepository;
+
     @InjectMocks
     private SupportService supportService;
 
@@ -55,19 +59,13 @@ class SupportServiceTest {
     @DisplayName("특정 공개 투두 아이템에 응원 1개 추가")
     void success_AddNag(){
         //given
-        PublicTodoEntity publicTodoEntity = PublicTodoEntity.builder()
-            .id(1L)
-            .numberOfSupport(0L)
-            .build();
 
         SupportEntity supportEntity = SupportEntity.builder()
             .supportSentUserPKId(2L)
             .publishedTodoPKId(1L)
             .build();
 
-        given(publicTodoRepository.findById(anyLong())).willReturn(Optional.of(publicTodoEntity));
-
-        given(publicTodoRepository.save(any())).willReturn(publicTodoEntity);
+        doNothing().when(supportNumberCacheRepository).plusOneSupport(1L);
 
         given(supportRepository.save(any())).willReturn(supportEntity);
 
@@ -75,8 +73,7 @@ class SupportServiceTest {
         supportService.addSupport(2L, 1L);
 
         //then
-        verify(publicTodoRepository, times(1)).findById(anyLong());
-        verify(publicTodoRepository, times(1)).save(any());
+        verify(supportNumberCacheRepository, times(1)).plusOneSupport(anyLong());
         verify(supportRepository, times(1)).save(any());
     }
 
@@ -84,6 +81,7 @@ class SupportServiceTest {
 
 
     @Test
+    @Disabled //레디스에서 체크하므로 공개 투두 아이템에 응원 1개를 추가할 때 publicTodoRepository를 볼 필요가 없다.
     @DisplayName("특정 공개 투두 아이템에 응원 1개 추가 실패 - 대상 투두 아이템 없음)")
     void failed_AddSupport_PublicTodoNotFound(){
         //given
@@ -106,14 +104,8 @@ class SupportServiceTest {
     @DisplayName("특정 공개 투두 아이템에 응원 한 것 취소")
     void success_CancelSupport(){
         //given
-        PublicTodoEntity publicTodoEntity = PublicTodoEntity.builder()
-            .id(1L)
-            .numberOfSupport(1L)
-            .build();
 
-        given(publicTodoRepository.findById(anyLong())).willReturn(Optional.of(publicTodoEntity));
-
-        given(publicTodoRepository.save(any())).willReturn(publicTodoEntity);
+        given(supportNumberCacheRepository.getSupportNumber(1L)).willReturn(2L);
 
         doNothing().when(supportRepository).deleteByPublishedTodoPKIdAndSupportSentUserPKId(anyLong(), anyLong());
 
@@ -121,8 +113,7 @@ class SupportServiceTest {
         supportService.undoSupport(2L, 1L);
 
         //then
-        verify(publicTodoRepository, times(1)).findById(anyLong());
-        verify(publicTodoRepository, times(1)).save(any());
+        verify(supportNumberCacheRepository, times(1)).getSupportNumber(anyLong());
         verify(supportRepository, times(1)).deleteByPublishedTodoPKIdAndSupportSentUserPKId(anyLong(), anyLong());
     }
 

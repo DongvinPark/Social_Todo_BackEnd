@@ -9,13 +9,16 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
 public class JWTProvider {
 
-    private static final String SECRET_KEY = "aJp4e1hf4AiuEr";
+    @Value("${jwt.secret.key}")
+    private String SECRET_KEY;
+
 
     /**
      * JWT를 생성한다.

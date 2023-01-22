@@ -16,3 +16,7 @@ aws:
   redis:
     url:
     port: 6379
+
+jwt:
+  secret:
+    key:

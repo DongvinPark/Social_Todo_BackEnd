@@ -153,7 +153,6 @@ public class UserService {
      * */
     @Transactional
     public void updateUserStatusMessage(Long userPKId, String statusMessage) {
-        //수정할 때 불러올 엔티티가 필요하기 때문에 이 부분을 삭제할 수는 없다.
         UserEntity userEntity = userRepository.findById(userPKId).orElseThrow(
             () -> SingletonException.USER_NOT_FOUND
         );

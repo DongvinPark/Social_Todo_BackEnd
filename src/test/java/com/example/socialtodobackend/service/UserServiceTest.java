@@ -7,6 +7,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.example.socialtodobackend.dto.publictodo.PublicTodoDto;
 import com.example.socialtodobackend.dto.user.UserDto;
@@ -388,11 +390,19 @@ class UserServiceTest {
     @DisplayName("유저 상태 메시지 수정")
     void success_UpdateUserStatusMessage(){
         //given
+        UserEntity user = UserEntity.builder()
+            .id(1L)
+            .statusMessage("변경 메시지")
+            .build();
+
+        given(userRepository.findById(1L)).willReturn(Optional.of(user));
 
         //when
+        userService.updateUserStatusMessage(1L, "변경 메시지");
 
         //then
-
+        verify(userRepository, times(1)).findById(1L);
+        verify(userRepository, times(1)).save(any());
     }
 
 

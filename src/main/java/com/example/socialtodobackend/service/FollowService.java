@@ -32,18 +32,9 @@ public class FollowService {
     @Transactional(readOnly = true)
     public List<UserFollowInfoDto> getFollowers(Long userPKId, PageRequest pageRequest) {
         //userPKID를 팔로우한(==userPKID가 팔로우를 받게 만든) 모든 사람들의 주키 아이디 값을 찾는다.
-        //중요한 것은 이때도 페이징이 필요하다는 것이다. 만약 어떤 유저의 팔로워 수가 1천 만 명이라면, 이것을 전부 리스트에 담는 것은
-        //서버의 메모리에 엄청난 부담을 줄 것이고, 아래에서 진행되는 유저 검색 쿼리도 비효율적으로 만들 것이기 때문이다.
-        //여기서도 페이징을 하는 것이 가능한 이유는, followSentUserPKIdList 의 요소의 숫자와 userRepository.findAllByIdIn(followSentUserPKIdList, pageRequest)
-        //의 검색 결과의 숫자가 항상 동일하며 1 대 1 매핑 관계를 이루고 있기 때문이다.
         List<Long> followSentUserPKIdList = followRepository.findAllByFollowReceivedUserId(userPKId, pageRequest).getContent().stream().map(FollowEntity::getFollowSentUserId).collect(Collectors.toList());
 
-        //유저 리포지토리에서 위에서 만든 주키 아이디 리스트에 포함되는 사람들을 페이징 처리하여 보여준다. 한 페이지당 몇 명씩 보여줄지는 CommonUtils에 상수로 정의돼 있다.
-        //주키 아이디 리스트에서 페이징 처리를 해주기 때문에 유저 리포지토리에서 리턴할 결과물의 개수는
-        //위에서 넘겨 받은 followReceivedUserPKIdList의 요소의 개수와 항상 동일하다.
-        //그리고 followReceivedUserPKIdList의 요소의 개수는 1개 페이지에서 포함 가능한
-        //개수인 CommonUtils.PAGE_SIZE를 초과할 수 없다.
-        //결론은 유저리포지토리에서 탐색할 때는 무조건 0번 페이지 1개만 반환하면 된다는 것이다.
+        //유저 리포지토리에서 위에서 만든 주키 아이디 리스트에 포함되는 사람들을 페이징 처리하여 보여준다.
         return userRepository.findAllByIdIn(followSentUserPKIdList, PageRequest.of(0, CommonUtils.PAGE_SIZE)).getContent().stream().map(UserFollowInfoDto::fromEntity).collect(Collectors.toList());
     }
 

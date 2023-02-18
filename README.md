@@ -15,7 +15,6 @@
 5. 스프링 @Async를 사용하여 단기간에 들어오는 대량의 응원/잔소리 요청을 비동기로 처리함으로써 사용자가 느끼는 응답 대기 시간을 감소시켰습니다.
 
 ## 프로젝트 구조
-- System Architecture
   <img src="https://user-images.githubusercontent.com/99060708/213954609-a60569b5-c80d-49d3-aec9-eec7b3a30511.jpeg" width="500" height="400"/>
 
 - ERD

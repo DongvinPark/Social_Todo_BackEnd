@@ -1,6 +1,5 @@
 package com.example.socialtodobackend.persist.redis;
 
-import com.example.socialtodobackend.exception.SingletonException;
 import com.example.socialtodobackend.utils.AWSSecretValues;
 import com.example.socialtodobackend.utils.CommonUtils;
 import java.time.Duration;
@@ -31,23 +30,28 @@ public class FolloweeListCacheRepository {
 
     //DB로부터 특정 유저가 팔로우한 사람들의 주키 아이디 값 리스트를 받아서 레디스에 저장한다.
     public void setFolloweeList(List<Long> pkIdList, Long userPKId) {
-        log.info("팔로이 리스트 셋팅 진입");
-        String key = getKey(userPKId);
+        try {
+            String key = getKey(userPKId);
 
-        template.expire(key, LIST_DURATION);
+            template.expire(key, LIST_DURATION);
 
-        for(Long id : pkIdList){
-            log.info("레디스 리스트 값 삽입 : " + id);
-            template.opsForList().rightPush(key, String.valueOf(id));
+            for(Long id : pkIdList){
+                template.opsForList().rightPush(key, String.valueOf(id));
+            }
+        } catch (Exception e) {
+            log.error("팔로이 리스트 캐싱 실패.");
         }
-        log.info("레디스에 팔로이 리스트 캐시 완료.");
     }
 
 
     //새로운 팔로우관계가 발생했을 경우, 처리해준다.
     public void addNewFollowee(Long userPKId, Long followeePKId){
-        String key = getKey(userPKId);
-        template.opsForList().rightPush(key, String.valueOf(followeePKId));
+        try {
+            String key = getKey(userPKId);
+            template.opsForList().rightPush(key, String.valueOf(followeePKId));
+        } catch (Exception e){
+            log.error("팔로이 리스트 추가 실패");
+        }
     }
 
 
@@ -61,12 +65,11 @@ public class FolloweeListCacheRepository {
 
             List<String> listFromRedis = template.opsForList().range(key, 0, size);
 
-            log.info("레디스로부터 리스트 가져오기 완료. Expire 설정은 나중에한다.");
-
             log.info("레디스로부터 팔로우 리스트 리턴 완료.");
             return listFromRedis.stream().map(Long::valueOf).collect(Collectors.toList());
         } catch (Exception e){
-            throw SingletonException.REDIS_GET_OPERATION_FAILED;
+            log.error("레디스로부터 팔로이 리스트 획득 실패");
+            return null;
         }
     }
 

@@ -1,6 +1,5 @@
 package com.example.socialtodobackend.persist.redis.numbers;
 
-import com.example.socialtodobackend.exception.SingletonException;
 import com.example.socialtodobackend.utils.AWSSecretValues;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,29 +21,42 @@ public class NagNumberCacheRepository {
             String value = template.opsForValue().get(key);
             return Long.parseLong(value);
         } catch (Exception e) {
-            throw SingletonException.REDIS_GET_OPERATION_FAILED;
+            log.error("잔소리 개수 가져오기 실패");
+            return null;
         }
     }
 
 
     //공개 투두 아이템이 만들어졌을 때 기록을 위한 키밸류 썅을 캐싱한다.
     public void setInitialNag(Long publicTodoPKId){
-        String key = getKey(publicTodoPKId);
-        template.opsForValue().set(key, "0");
+        try {
+            String key = getKey(publicTodoPKId);
+            template.opsForValue().set(key, "0");
+        } catch (Exception e) {
+            log.error("초기 잔소리 개수 캐싱 실패");
+        }
     }
 
 
     //잔소리 숫자를 += 1 한다.
     public void plusOneNag(Long publicTodoPKId){
-        String key = getKey(publicTodoPKId);
-        template.opsForValue().increment(key);
+        try {
+            String key = getKey(publicTodoPKId);
+            template.opsForValue().increment(key);
+        } catch (Exception e) {
+            log.error("잔소리 숫자 1 누적 실패.");
+        }
     }
 
 
     //잔소리 숫자를 -= 1 한다.
     public void minusOneNag(Long publicTodoPKId){
-        String key = getKey(publicTodoPKId);
-        template.opsForValue().decrement(key);
+        try {
+            String key = getKey(publicTodoPKId);
+            template.opsForValue().decrement(key);
+        } catch (Exception e) {
+            log.error("잔소리 숫자 1 차감 실패.");
+        }
     }
 
 

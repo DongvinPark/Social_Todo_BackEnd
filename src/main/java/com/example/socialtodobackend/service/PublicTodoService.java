@@ -35,15 +35,31 @@ public class PublicTodoService {
     /**
      * 특정 유저가 작성한 모든 공개 투두 아이템들을 읽어들인다.
      * 이때, 공개 투두 아이템 각각에 대한 응원/잔소리 정보를 레디스 캐시서버에서 가져와서 PublicTodoDto 구성에 사용해야 한다.
+     * 레디스에서 확인할 수 없는 경우에만 DB를 본다.
      * */
     @Transactional(readOnly = true)
     public List<PublicTodoDto> getAllPublicTodo(Long authorUserPKId, PageRequest pageRequest) {
         return publicTodoRepository.findAllByAuthorUserId(authorUserPKId, pageRequest).getContent().stream().map(
-            publicTodoEntity -> PublicTodoDto.fromEntity(
-                publicTodoEntity,
-                supportNumberCacheRepository.getSupportNumber(publicTodoEntity.getId()),
-                nagNumberCacheRepository.getNagNumber(publicTodoEntity.getId())
-            )
+            publicTodoEntity -> {
+
+                // 레디스 서버에서 응원 개수를 먼저 확인하고, 그것이 불가능할 때는 DB에서 확인한 후
+                // 다음 요청에 대비하여 다시 레디스에 캐싱 요청을 해 둔다.
+                Long supportNumber = supportNumberCacheRepository.getSupportNumber(
+                    publicTodoEntity.getId());
+                if(supportNumber == null) {
+                    supportNumber = supportRepository.countByPublishedTodoPKId(
+                        publicTodoEntity.getId());
+                    supportNumberCacheRepository.setInitialSupport(publicTodoEntity.getId());
+                }
+
+                Long nagNumber = nagNumberCacheRepository.getNagNumber(publicTodoEntity.getId());
+                if(nagNumber == null) {
+                    nagNumber = nagRepository.countByPublishedTodoPKId(publicTodoEntity.getId());
+                    nagNumberCacheRepository.setInitialNag(publicTodoEntity.getId());
+                }
+
+                return PublicTodoDto.fromEntity(publicTodoEntity, supportNumber, nagNumber);
+            }
         ).collect(Collectors.toList());
     }
 

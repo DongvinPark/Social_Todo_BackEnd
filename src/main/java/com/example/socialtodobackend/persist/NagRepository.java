@@ -14,4 +14,6 @@ public interface NagRepository extends JpaRepository<NagEntity, Long> {
 
     void deleteByPublishedTodoPKIdAndNagSentUserPKId(Long publishedTodoPKId, Long nagSentUserPKId);
 
+    Long countByPublishedTodoPKId(Long publishedTodoPKId);
+
 }

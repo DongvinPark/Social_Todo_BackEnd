@@ -15,4 +15,6 @@ public interface SupportRepository extends JpaRepository<SupportEntity, Long> {
     void deleteByPublishedTodoPKIdAndSupportSentUserPKId(Long publishedTodoPKId,
         Long supportSentUserPKId);
 
+    Long countByPublishedTodoPKId(Long publishedTodoPKId);
+
 }

@@ -4,7 +4,6 @@ import com.example.socialtodobackend.dto.user.UserDto;
 import com.example.socialtodobackend.exception.SingletonException;
 import com.example.socialtodobackend.persist.NagEntity;
 import com.example.socialtodobackend.persist.NagRepository;
-import com.example.socialtodobackend.persist.PublicTodoRepository;
 import com.example.socialtodobackend.persist.UserRepository;
 import com.example.socialtodobackend.persist.redis.numbers.NagNumberCacheRepository;
 import com.example.socialtodobackend.utils.CommonUtils;
@@ -20,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class NagService {
 
-    private final PublicTodoRepository publicTodoRepository;
     private final NagRepository nagRepository;
     private final UserRepository userRepository;
     private final NagNumberCacheRepository nagNumberCacheRepository;

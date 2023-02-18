@@ -22,17 +22,24 @@ public class JwtCacheRepository {
 
 
     public void setJwtAtRedis(String jwt, Long userPKId) {
-        String key = getKey(userPKId);
-        template.opsForValue().set(key, jwt, JWT_DURATION);
-        log.info("레디스에 유저 jwt 셋팅 완료.");
+        try {
+            String key = getKey(userPKId);
+            template.opsForValue().set(key, jwt, JWT_DURATION);
+        } catch (Exception e) {
+            log.error("JWT 캐싱 실패.");
+        }
     }
 
 
     public String getJwtFromRedis(Long userPKId){
-        String key = getKey(userPKId);
-        String jwt = template.opsForValue().get(key);
-        log.info("레디스로부터 유저 키 가져오기 완료.");
-        return jwt;
+        try {
+            String key = getKey(userPKId);
+            String jwt = template.opsForValue().get(key);
+            return jwt;
+        } catch (Exception e) {
+            log.error("레디스에서 JWT 가져오기 실패");
+            return null;
+        }
     }
 
 

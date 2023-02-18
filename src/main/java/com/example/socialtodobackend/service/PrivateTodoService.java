@@ -25,7 +25,7 @@ public class PrivateTodoService {
      * 프라이빗 투두 아이템 한 개를 추가한다.
      * */
     @Transactional
-    public boolean createPrivateTodoEntity(
+    public void createPrivateTodoEntity(
         Long authorUserPKId,
         PrivateTodoCreateRequest privateTodoCreateRequest
     ) {
@@ -40,7 +40,7 @@ public class PrivateTodoService {
                 .build()
         );
 
-        return true;
+        //return true;
     }
 
 

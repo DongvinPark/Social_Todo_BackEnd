@@ -138,7 +138,6 @@ public class UserService {
     /**
      * 유저의 닉네임을 검색한다.
      * 닉네임은 영소문자 또는 숫자로만 구성돼 있으므로 이를 어긴 검색어에 대해서는 예외를 던진다.
-     * 페이징이 필요하다.
      * */
     @Transactional(readOnly = true)
     public List<UserDto> searchUsersByNickname(String userNickname, PageRequest pageRequest) {

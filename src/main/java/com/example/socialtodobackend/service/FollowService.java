@@ -104,10 +104,6 @@ public class FollowService {
 
 
 
-    //------------- PRIVATE HELPER METHODS AREA ------------
-
-
-
     private void validateFollowRelatedUser(Long followRelationTargetUserPKId){
         //인증 생략 불가능. followRelationTargetUserPKId 는 JwtAuthenticationFilter에서 필터링을 거치지 않고 바로 RequestParam으로 들어오는 변수이기 때문이다.
         if(!userRepository.existsById(followRelationTargetUserPKId))throw SingletonException.USER_NOT_FOUND;

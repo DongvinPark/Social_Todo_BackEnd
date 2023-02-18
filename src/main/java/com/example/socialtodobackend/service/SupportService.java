@@ -2,7 +2,6 @@ package com.example.socialtodobackend.service;
 
 import com.example.socialtodobackend.dto.user.UserDto;
 import com.example.socialtodobackend.exception.SingletonException;
-import com.example.socialtodobackend.persist.PublicTodoRepository;
 import com.example.socialtodobackend.persist.SupportEntity;
 import com.example.socialtodobackend.persist.SupportRepository;
 import com.example.socialtodobackend.persist.UserRepository;
@@ -20,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class SupportService {
 
-    private final PublicTodoRepository publicTodoRepository;
     private final SupportRepository supportRepository;
     private final UserRepository userRepository;
     private final SupportNumberCacheRepository supportNumberCacheRepository;

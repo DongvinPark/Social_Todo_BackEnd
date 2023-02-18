@@ -168,8 +168,6 @@ public class UserService {
 
 
 
-    //--------------- PRIVATE HELPER METHOD AREA ------------
-
 
     /**
      * 닉네임에 영소문자 또는 숫자의 조합으로 이루어져 있는지,

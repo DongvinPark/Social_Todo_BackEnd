@@ -1,8 +1,10 @@
 package com.example.socialtodobackend.configuration.async;
 
 import java.lang.reflect.Method;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 
+@Slf4j
 public class CustomAsyncExceptionHandler
     implements AsyncUncaughtExceptionHandler {
 
@@ -10,10 +12,10 @@ public class CustomAsyncExceptionHandler
     public void handleUncaughtException(
         Throwable throwable, Method method, Object... obj) {
 
-        System.out.println("예외 메시지 - " + throwable.getMessage());
-        System.out.println("예외 발생한 메서드 이름 - " + method.getName());
+        log.error("@Async 예외 메시지 - " + throwable.getMessage());
+        log.error("@Async 예외 발생한 메서드 이름 - " + method.getName());
         for (Object param : obj) {
-            System.out.println("파라미터 값 - " + param);
+            log.error("@Async 관련 예외 파라미터 값 - " + param);
         }
     }
 

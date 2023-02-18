@@ -194,10 +194,7 @@ public class UserService {
             throw SingletonException.INVALID_NICKNAME;
         }
         for(char c : input.toCharArray()){
-            if(Character.isDigit(c) || Character.isLowerCase(c)){
-                continue;
-            }
-            else{
+            if(!Character.isDigit(c) && !Character.isLowerCase(c)){
                 throw SingletonException.INVALID_NICKNAME;
             }
         }

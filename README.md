@@ -29,12 +29,12 @@
 - ![AWS RDS](https://img.shields.io/badge/-AWS%20RDS%20MariaDB%2010.6.8-blue)
 
 ## 핵심 기능 코드
-- [레디스를 이용해서 유저 확인을 위한 DB I/O를 감소시켰습니다.](https://github.com/DongvinPark/Social_Todo_BackEnd/blob/09_Spring_%40Async_Applied/src/main/java/com/example/socialtodobackend/security/JWTAuthenticationFilter.java)
-- [레디스를 이용해서 타임라인 요청 시에 필요한 DB I/O를 감소시켰습니다.](https://github.com/DongvinPark/Social_Todo_BackEnd/blob/09_Spring_%40Async_Applied/src/main/java/com/example/socialtodobackend/service/UserService.java)
-- [응원/잔소리 요청을 레디스에서 처리하게 만들어서 DB I/O를 감소시켰습니다.](https://github.com/DongvinPark/Social_Todo_BackEnd/blob/09_Spring_%40Async_Applied/src/main/java/com/example/socialtodobackend/service/SupportService.java)
+- [레디스를 이용해서 유저 확인을 위한 DB I/O를 감소시켰습니다.](https://github.com/DongvinPark/Social_Todo_BackEnd/blob/10_Refactoring_Applied/src/main/java/com/example/socialtodobackend/security/JWTAuthenticationFilter.java)
+- [레디스를 이용해서 타임라인 요청 시에 필요한 DB I/O를 감소시켰습니다.](https://github.com/DongvinPark/Social_Todo_BackEnd/blob/10_Refactoring_Applied/src/main/java/com/example/socialtodobackend/service/UserService.java)
+- [응원/잔소리 요청을 레디스에서 처리하게 만들어서 DB I/O를 감소시켰습니다.](https://github.com/DongvinPark/Social_Todo_BackEnd/blob/10_Refactoring_Applied/src/main/java/com/example/socialtodobackend/service/SupportService.java)
 - [스프링 @Async를 위한 스레드 풀의 개수를 셋팅할 때 로컬 환경에서 직접 테스트를 해보고 결정하였습니다.](https://github.com/DongvinPark/Spring_Async_Test)
-- [스프링 @Async를 사용하여 대량의 응원/잔소리 트래픽을 처리할 때 발생할 수 있는 예외들을 잡아내기 위한 처리를 해주었습니다.](https://github.com/DongvinPark/Social_Todo_BackEnd/tree/09_Spring_%40Async_Applied/src/main/java/com/example/socialtodobackend/configuration/async)
-- [서비스 계층 메서드에 대하여 Junit5 테스트 코드를 모두 작성하고 통과하였습니다.](https://github.com/DongvinPark/Social_Todo_BackEnd/tree/09_Spring_%40Async_Applied/src/test/java/com/example/socialtodobackend/service)
+- [스프링 @Async를 사용하여 대량의 응원/잔소리 트래픽을 처리할 때 발생할 수 있는 예외들을 잡아내기 위한 처리를 해주었습니다.](https://github.com/DongvinPark/Social_Todo_BackEnd/blob/10_Refactoring_Applied/src/main/java/com/example/socialtodobackend/configuration/async/CustomAsyncExceptionHandler.java)
+- [서비스 계층 메서드에 대하여 Junit5 테스트 코드를 모두 작성하고 통과하였습니다.](https://github.com/DongvinPark/Social_Todo_BackEnd/tree/10_Refactoring_Applied/src/test/java/com/example/socialtodobackend/service)
 
 ## AWS 배포 후 테스트 로그 기록
 - 아래의 파일은 AWS EC2에 배포 후 직접 요청을 보내서 테스트를 완료한 과정을 기록한 파일입니다.

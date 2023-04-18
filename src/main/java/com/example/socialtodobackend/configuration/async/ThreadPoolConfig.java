@@ -20,7 +20,7 @@ public class ThreadPoolConfig extends AsyncConfigurerSupport {
         executor.setCorePoolSize(2*n);
         executor.setMaxPoolSize(2*n);
         executor.setQueueCapacity(CommonUtils.NUMBER_OF_EXPECTED_MAX_REQUEST *3);
-        executor.setThreadNamePrefix("GithubLookup-");
+        executor.setThreadNamePrefix("Async Thread -");
         executor.initialize();
         return executor;
     }
